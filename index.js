@@ -5,7 +5,6 @@ let hostName = "";				// name of host folder, e.g. "host", "host2"...
 let swScope = "";				// scope of Service Worker
 let folderHandle = null;		// File system API handle (or polyfill) of folder to serve
 let folderName = "";
-let hasIndexHtml = false;		// True if root directory has index.html
 
 const pickFolderButton = document.getElementById("pickfolder");
 const inputFolderElem = document.getElementById("inputfolder");
@@ -16,16 +15,6 @@ if (window.showDirectoryPicker)
 	async function InitFolderHandle()
 	{
 		folderName = folderHandle.name;
-		
-		// Check if folder has index.html file
-		try {
-			await folderHandle.getFileHandle("index.html");
-			hasIndexHtml = true;
-		}
-		catch
-		{
-			hasIndexHtml = false;
-		}
 		
 		// Ensure SW ready then tell it to start hosting for this client
 		await Utils.WaitForSWReady();
@@ -106,9 +95,7 @@ else
 			// Add this file to the folder structure
 			folderHandle.AddFile(pathStr, file);
 		}
-		
-		hasIndexHtml = folderHandle.HasFile("index.html");
-		
+				
 		// Ensure SW ready then tell it to start hosting for this client
 		await Utils.WaitForSWReady();
 		
@@ -165,7 +152,7 @@ function OnHostStarted(data)
 	document.getElementById("foldername").textContent = folderName;
 	
 	const hostLinkElem = document.getElementById("hostlink");
-	const hostUrl = `${swScope}${hostName}/${hasIndexHtml ? "index.html" : ""}`;
+	const hostUrl = `${swScope}${hostName}/`;
 	hostLinkElem.setAttribute("href", hostUrl);
 	hostLinkElem.textContent = hostUrl;
 
