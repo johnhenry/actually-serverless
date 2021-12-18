@@ -192,7 +192,16 @@ async function HandleFetch(e)
 		const lastName = subfolderArr[subfolderArr.length - 1];
 		if (!lastName)		// empty name, e.g. for root /, treated as folder
 		{
-			file = await GenerateDirectoryListing(curFolderHandle, relativeUrl);
+			try {	
+				// Check for default 'index.html' if empty directory.
+				const fileHandle = await curFolderHandle.getFileHandle('index.html');
+				file = await fileHandle.getFile();
+			}
+			catch
+			{	// Serve directory listing
+				file = await GenerateDirectoryListing(curFolderHandle, relativeUrl);
+			}
+
 		}
 		else
 		{
