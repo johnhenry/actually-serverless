@@ -75,9 +75,28 @@ async function StartHost(e)
 	// Look to see if there are any other active hosts. If this is the first, just use
 	// the name "host", otherwise add a number e.g. "host2".
 	const hostKeys = await storageKeys();
-	const hostName = "host" + (hostKeys.length === 0 ? "" : hostKeys.length + 1);
+
+  let { hostNamePattern = "host{:}" } = e.data;
+  hostNamePattern = hostNamePattern || "host{:}";
+  let hostName;
+  const numMatch = /({#+})/;
+  const numMatch2 = /({:+})/;
+  if (numMatch.test(hostNamePattern)) {
+    const [full, match] = numMatch.exec(hostNamePattern);
+    const count = String(hostKeys.length).padStart(match.length - 2, "0");
+    const [end1, end2] = hostNamePattern.split(match);
+    hostName = `${end1}${count}${end2}`;
+  } else if (numMatch2.test(hostNamePattern)) {
+    const [full, match] = numMatch2.exec(hostNamePattern);
+    const count = String(hostKeys.length).padStart(match.length - 2, "0");
+    const [end1, end2] = hostNamePattern.split(match);
+    hostName = `${end1}${hostKeys.length ? count : ""}${end2}`;
+  } else {
+    hostName =
+      hostNamePattern + (hostKeys.length === 0 ? "" : hostKeys.length + 1);
+  }
 	const clientId = e.source.id;
-	
+
 	// Write the host name to storage mapped to the client ID hosting it.
 	await storageSet(hostName, clientId);
 	

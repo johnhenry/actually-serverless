@@ -8,6 +8,7 @@ let folderName = "";
 
 const pickFolderButton = document.getElementById("pickfolder");
 const inputFolderElem = document.getElementById("inputfolder");
+const inputFolderElem = document.getElementById("inputfolder");
 
 // Use File System API if available
 if (window.showDirectoryPicker)
@@ -20,8 +21,9 @@ if (window.showDirectoryPicker)
 		await Utils.WaitForSWReady();
 		
 		Utils.PostToSW({
-			type: "host-start"
-		});
+      type: "host-start",
+      hostNamePattern: hostNamePattern.value,
+    });
 	};
 	
 	pickFolderButton.removeAttribute("hidden");
