@@ -164,7 +164,7 @@ async function HostFetch(hostName, url)
 				reject();
 		});
 	});
-	
+
 	// Post to the client to ask it to provide this file.
 	client.postMessage({
 		type: "fetch",

@@ -24,11 +24,16 @@
 <button id="uselastfolder" hidden>Use last folder</button>
 <input type="file" webkitdirectory id="inputfolder" hidden>
 
-<div id="hostinfo">
-	<h2 id="hosttitle">Files in folder '<span id="foldername"></span>' are now hosted at:</h2>
-	<a href="" id="hostlink" target="_blank"></a>
-	<p>The link only works locally as long as this page is left open.</p>
-</div>
+<table id="hostinfo">
+  <tr>
+    <th>Folder</th>
+    <th>Host</th>
+  </tr>
+  <tr id="hosttitle">
+    <td id="foldername"></td>
+    <td><a href="" id="hostlink" target="_blank"></a></td>
+  </tr>
+</table>
 
 <details>
 <summary>More information</summary>

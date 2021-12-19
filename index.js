@@ -6,6 +6,8 @@ let swScope = "";				// scope of Service Worker
 let folderHandle = null;		// File system API handle (or polyfill) of folder to serve
 let folderName = "";
 
+// Collections of hosts
+const hosts = {};
 const pickFolderButton = document.getElementById("pickfolder");
 const inputFolderElem = document.getElementById("inputfolder");
 const hostNamePattern = document.getElementById("hostNamePattern");
@@ -37,10 +39,10 @@ if (window.showDirectoryPicker)
 		{
 			console.log("Exception picking folder: ", err);
 		}
-		
+
 		if (!folderHandle)
 			return;
-		
+
 		await InitFolderHandle();
 		
 		// Write this folder handle to storage so it can be re-used next time
@@ -108,7 +110,7 @@ else
 	
 	inputFolderElem.removeAttribute("hidden");
 	inputFolderElem.addEventListener("change", InitFileList);
-	
+
 	// If browser has remembered file list, e.g. Firefox reloading page, init immediately
 	if (inputFolderElem.files.length > 0)
 		InitFileList();
@@ -149,14 +151,25 @@ function OnHostStarted(data)
 {
 	hostName = data.hostName;
 	swScope = data.scope;
-	
+
+	hosts[hostName] = folderHandle;
 	document.getElementById("hostinfo").style.display = "block";
-	document.getElementById("foldername").textContent = folderName;
-	
-	const hostLinkElem = document.getElementById("hostlink");
-	const hostUrl = `${swScope}${hostName}/`;
+
+  const folderData = document.createElement("td");
+  folderData.textContent = folderName;
+
+  const linkData = document.createElement("td");
+  const hostLinkElem = document.createElement("a");
+  const hostUrl = `${swScope}${hostName}/`;
 	hostLinkElem.setAttribute("href", hostUrl);
+  hostLinkElem.setAttribute("target", "_blank");
 	hostLinkElem.textContent = hostUrl;
+  linkData.appendChild(hostLinkElem);
+
+  const hostRow = document.createElement("tr");
+  hostRow.appendChild(folderData);
+  hostRow.appendChild(linkData);
+  document.getElementById("hostinfo").append(hostRow);
 
 	document.title = `Serving '${folderName}' to '${hostName}'`;
 }
@@ -165,9 +178,9 @@ function OnHostStarted(data)
 async function HandleFetch(e)
 {
 	try {
-		
+
 		let relativeUrl = decodeURIComponent(e.data.url);
-		
+    const {hostName} = e.data;
 		// Strip trailing / if any, so the last token is the folder/file name
 		if (relativeUrl.endsWith("/"))
 			relativeUrl = relativeUrl.substr(0, relativeUrl.length - 1);
@@ -182,7 +195,7 @@ async function HandleFetch(e)
 		// polyfill when using webkitdirectory fallback.
 		const subfolderArr = relativeUrl.split("/");
 		
-		let curFolderHandle = folderHandle;
+		let curFolderHandle = hosts[hostName];
 		for (let i = 0, len = subfolderArr.length - 1 /* skip last */; i < len; ++i)
 		{
 			const subfolder = subfolderArr[i];
