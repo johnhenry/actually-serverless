@@ -8,7 +8,7 @@ let folderName = "";
 
 const pickFolderButton = document.getElementById("pickfolder");
 const inputFolderElem = document.getElementById("inputfolder");
-const inputFolderElem = document.getElementById("inputfolder");
+const hostNamePattern = document.getElementById("hostNamePattern");
 
 // Use File System API if available
 if (window.showDirectoryPicker)
