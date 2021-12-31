@@ -71,7 +71,7 @@ const addClient = async (event) => {
     }
   }
   event.source.postMessage({
-    type: "client-added",
+    type: "clients-updated",
     index,
     total: clients.length,
     backup,
@@ -81,7 +81,7 @@ const addClient = async (event) => {
     if (i !== index) {
       const client = await self.clients.get(clients[i]);
       client.postMessage({
-        type: "client-added",
+        type: "clients-updated",
         index: i,
         total: clients.length,
         strategies,
@@ -91,8 +91,29 @@ const addClient = async (event) => {
 };
 const removeClient = async (event) => {
   const clients = (await storageGet("clients")) || [];
-  clients[clients.indexOf(event.source.id)] = null;
+  const index = clients.indexOf(event.source.id);
+  const hosts = (await storageGet("hosts")) || {};
+  const entries = [...Object.entries(hosts)].reduce((previous, current) => {
+    return previous.concat(current[1]);
+  }, []);
+  if (entries.indexOf(index) > -1) {
+    clients[index] = null;
+  } else {
+    clients.splice(index, 1);
+  }
   storageSet("clients", clients);
+  const strategies = (await storageGet("strategies")) || {};
+  for (let i = 0; i < clients.length; i++) {
+    if (i !== index) {
+      const client = await self.clients.get(clients[i]);
+      client.postMessage({
+        type: "clients-updated",
+        index: i,
+        total: clients.length,
+        strategies,
+      });
+    }
+  }
 };
 
 const claimHost = async (event) => {
@@ -103,17 +124,27 @@ const claimHost = async (event) => {
   // if (allClients.length <= 1) await storageClear();
   const { host } = event.data;
   // Tell client it's now hosting.
-  const strategies = (await storageGet("strategies")) || {};
-  strategies[host] = strategies[host] || "first";
-  storageSet("strategies", strategies);
+
   const clients = (await storageGet("clients")) || [];
   const index = clients.indexOf(event.source.id);
   const hosts = (await storageGet("hosts")) || {};
   hosts[host] = hosts[host] || [];
+  const hostLength = hosts[host].length;
   if (!hosts[host].includes(index)) {
     hosts[host].push(index);
   }
-  storageSet("hosts", hosts);
+  await storageSet("hosts", hosts);
+  const strategies = (await storageGet("strategies")) || {};
+  strategies[host] = strategies[host] || "first";
+  if (
+    strategies[host] === "first" &&
+    hostLength === 1 &&
+    hosts[host].length === 2
+  ) {
+    strategies[host] = "round-robin";
+  }
+  await storageSet("strategies", strategies);
+
   postToClients({
     type: "hosts-updated",
     strategies,
@@ -154,7 +185,6 @@ const setStrategy = async (event) => {
 };
 const backupClient = async (event) => {
   const clients = (await storageGet("clients")) || [];
-  console.log("BACKUP", event.data.data);
   await storageSet(
     `backup/${event.data.host}/${clients.indexOf(event.source.id)}`,
     event.data.data
@@ -214,6 +244,13 @@ const getClient = async (host) => {
         const index = (await storageGet(`round-robin-index-for-${host}`)) || 0;
         id = ids[index];
         storageSet(`round-robin-index-for-${host}`, (index + 1) % ids.length);
+      }
+      break;
+    case "recent":
+      {
+        const index =
+          ((await storageGet(`round-robin-index-for-${host}`)) || 0) - 1;
+        id = ids[index !== -1 ? index : ids.length - 1];
       }
       break;
     case "first":

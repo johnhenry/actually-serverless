@@ -1,6 +1,6 @@
 // For generating a directory listing page for a folder
 import generateDirectoryListing from "./generateDirectoryListing.mjs";
-
+// TODO: folder listing broken somehow
 export default async () => {
   const folderHandle = await window.showDirectoryPicker();
   const fetch = async ({ url }) => {

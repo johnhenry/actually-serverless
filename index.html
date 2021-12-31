@@ -21,6 +21,12 @@
           data-strategy="random"
         >
         </span>
+        <span
+          class="set-strategy circ recent"
+          title="select strategy: recent"
+          data-strategy="recent"
+        >
+        </span>
         <a href="./host/$HOST_ID/" target="_blank" title="host/$HOST_ID"
           >$HOST_ID/</a
         >
@@ -38,12 +44,16 @@ $FUNCTION_TEXT</textarea
       >
     </div>
   </template>
-
   <head>
     <meta name="charset" value="utf8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Serve folder for web development</title>
+    <title>Local Cluster for web development</title>
+    <!--TODO: Update icon-->
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css"
+    />
     <link rel="stylesheet" href="index.css" />
     <script type="module">
       import IDBKeyVal from "./idb-keyval.mjs";
@@ -58,17 +68,54 @@ $FUNCTION_TEXT</textarea
       <a title="settings" href="#settings">Settings</a>
       <a title="environment" href="#environment">Environment</a>
       <a title="about" href="#about">About</a>
+      <span
+        >Client: <span id="client-index"></span
+        ><a href="." target="_blank"> +</a></span
+      >
     </header>
     <section class="pages">
       <section id="requests" class="view">r</section>
       <section id="settings" class="view">s</section>
       <section id="environment" class="view">e</section>
-      <section id="about" class="view">a</section>
+      <section id="about" class="view">
+        <h2>What is this</h2>
+        <p></p>
+        <h2>Why is it useful</h2>
+        <p></p>
+        <h2>How does it work</h2>
+        <p></p>
+        <h2>Comparison to Serevefolder.dev</h2>
+        <p>
+          This is a fork of
+
+          <a
+            href="https://github.com/AshleyScirra/servefolder.dev"
+            target="_blank"
+            >servefolder.dev</a
+          >
+
+          <a href="https://servefolder.dev/" target="_blank">(hosted here)</a>,
+          so comparisons are welcome.
+        </p>
+        <table class="comparison-table">
+          <tr>
+            <th>Feature</th>
+            <th>Servefolder.dev</th>
+            <th>LocalCluster.dev</th>
+          </tr>
+          <tr>
+            <td>Cloud Functions</td>
+            <td>𐄂</td>
+            <td class="clear-winner">✓</td>
+          </tr>
+          <tr>
+            <td>Browser Compatibility</td>
+            <td>Chrome, Firefox, Safari</td>
+            <td>Chrome</td>
+          </tr>
+        </table>
+      </section>
       <section id="hosts" class="view hosts">
-        <span
-          >Client: <span id="client-index"></span
-          ><a href="." target="_blank"> +</a></span
-        >
         <span>
           <button id="add-host">New Host</button>
           <label>
@@ -76,7 +123,6 @@ $FUNCTION_TEXT</textarea
             Random Name
           </label>
         </span>
-
         <div id="host-list"></div>
         <div id="log-box">
           <div id="logs"></div>

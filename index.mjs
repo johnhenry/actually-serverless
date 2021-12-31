@@ -42,7 +42,7 @@ const hostsUpdated = (event) => {
 };
 const hostRemoved = (event) => {};
 const clusterTakenover = () => window.location.reload();
-const clientAdded = async (event) => {
+const clientsUpdated = async (event) => {
   if (event.data.backup && event.data.backup.length) {
     for (const [host, { fs, funcText }] of event.data.backup) {
       hosts[host] = {
@@ -183,8 +183,8 @@ console.log("SW ready");
 navigator.serviceWorker.addEventListener("message", (event) => {
   console.log("SW type", event.data.type);
   switch (event.data.type) {
-    case "client-added":
-      clientAdded(event);
+    case "clients-updated":
+      clientsUpdated(event);
       break;
     case "hosts-updated":
       hostsUpdated(event);
@@ -249,7 +249,7 @@ document.getElementById("add-host").addEventListener("click", () => {
     });
   }
 });
-// TODO: I don't think this always unloas properly -- especially when refreshing... possibly before sw is ready?
+// TODO: I don't think this always unloas properly -- especially when refreshing... possibly before sw is ready? Maybe use "beforeunload" instead?
 window.addEventListener("unload", () => {
   Utils.PostToSW({
     type: "remove-client",
