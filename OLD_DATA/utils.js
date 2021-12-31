@@ -43,8 +43,8 @@ export async function WaitForSWReady() {
   }
 }
 
-export function PostToSW(...o) {
-  navigator.serviceWorker.controller.postMessage(...o);
+export function PostToSW(o) {
+  navigator.serviceWorker.controller.postMessage(o);
 }
 
 const idbkvStore = IDBKeyVal.createStore("host-page", "host-store");

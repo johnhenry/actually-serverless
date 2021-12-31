@@ -1,113 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+  <template id="template-host">
+    <div id="$HOST_ID" class="host">
+      <main>
+        <span
+          class="set-strategy circ first"
+          title="select strategy: first"
+          data-strategy="first"
+        >
+        </span>
+        <span
+          class="set-strategy circ round-robin"
+          title="select strategy: round-robin"
+          data-strategy="round-robin"
+        >
+        </span>
+        <span
+          class="set-strategy circ random"
+          title="select strategy: random"
+          data-strategy="random"
+        >
+        </span>
+        <a href="./host/$HOST_ID/" target="_blank" title="host/$HOST_ID"
+          >$HOST_ID/</a
+        >
+        <button class="set-file-handler">📁</button>
+        <span class="close"></span>
+      </main>
+      <textarea
+        class="update-function"
+        placeholder="Click 📁 to serve a folder or add some code here to modify a request."
+      >
+$FUNCTION_TEXT</textarea
+      >
+    </div>
+  </template>
+
   <head>
-    <meta charset="utf8" />
+    <meta name="charset" value="utf8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Serve folder for web development</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="index.css" />
+    <script src="idb-keyval.js" defer></script>
+    <script src="index.mjs" type="module"></script>
   </head>
   <body>
-    <form action="http://localhost:8080/servefolder/host/host/" method="post">
-      <input type="text" name="file" />
-      <input type="submit" value="Upload" />
-    </form>
-    <div id="mainwrap">
-      <h1 id="maintitle">Serve folder</h1>
-      <p>
-        Serve a local folder of files in your browser for easy testing without
-        having to run a server.
-      </p>
-
-      <noscript
-        ><strong
-          >This page requires JavaScript to work, but it looks like JavaScript
-          is disabled. Please enable JavaScript and try again.</strong
-        ></noscript
-      >
-
-      <br />
-      <button id="uselastfolder" hidden>Use last folder</button>
-      <input type="file" webkitdirectory id="inputfolder" hidden />
-      <br />
-      <table id="hostinfo">
-        <tr>
-          <th>Folder</th>
-          <th>Host</th>
-        </tr>
-      </table>
-      <br />
-      <span>
-        Host Path:
-        <input type="text" placeholder="host{:}" id="hostNamePattern" />
-        <button id="pickfolder" hidden>Pick folder</button>
-        <button id="createfunction">Create Function</button>
-      </span>
-
-      <details>
-        <summary>More information</summary>
-        <h3>What is this?</h3>
-        <p>
-          This page lets you host a local folder with web development files,
-          such as HTML, JavaScript and CSS, directly in your browser. It works
-          using Service Workers: everything is served from your local system
-          only, nothing is uploaded to a server, and your files are not shared
-          with anybody else.
-        </p>
-
-        <h3>Why is it useful?</h3>
-        <p>
-          In some enviroments running a HTTP server may be difficult or
-          inconvenient, for example if you're on a system with limited
-          permissions. Alternatively it's another quick way to quickly test some
-          web development files.
-        </p>
-
-        <h3>How does it work?</h3>
-        <p>
-          Click the big button at the top and choose a folder. Once chosen and
-          any permission prompt approved, a link will appear. Click the link and
-          it will open a new tab and load index.html if a file with that name
-          exists, otherwise it will show the contents of the folder for
-          browsing. This is particularly useful with HTML files, which are also
-          able to load all sub-resources like they can on a normal web server,
-          but this does not actually involve a HTTP server (it works using
-          Service Workers). Note the provided link will only work so long as
-          this page remains open &mdash; as soon as you close the page the link
-          will stop working.
-        </p>
-
-        <p>
-          You can also open this tab multiple times and host different folders
-          simultaneously. Additional tabs will host at a different URL for
-          accessing different folders.
-        </p>
-
-        <h3>Is my data kept private?</h3>
-        <p>
-          Yes. Your chosen files will not leave your computer. The files will
-          not be accessible by anyone else, the provided link only works for
-          you, and nothing is transmitted over a network while loading it.
-        </p>
-
-        <h3>Who made this?</h3>
-        <p>
-          Hi, I'm <a href="https://twitter.com/ashleygullen">@AshleyGullen</a>,
-          founder of Scirra and lead developer on
-          <a href="https://www.construct.net/">Construct</a>.
-        </p>
-
-        <p>
-          <em
-            >v1.1 &mdash; last updated December 8th 2021 &mdash;
-            <a href="https://github.com/AshleyScirra/servefolder.dev"
-              >View code on GitHub</a
-            ></em
-          >
-        </p>
-      </details>
-
-      <script src="idb-keyval.js" defer></script>
-      <script src="index.js" type="module"></script>
-    </div>
+    <header>
+      <a title="hosts" href="#">Hosts</a>
+      <a title="requests" href="#requests">Requests</a>
+      <a title="settings" href="#settings">Settings</a>
+      <a title="environment" href="#environment">Environment</a>
+      <a title="about" href="#about">About</a>
+    </header>
+    <section class="pages">
+      <section id="requests" class="view">r</section>
+      <section id="settings" class="view">s</section>
+      <section id="environment" class="view">e</section>
+      <section id="about" class="view">a</section>
+      <section id="hosts" class="view hosts">
+        <button id="add-host">Add Host</button>
+        <div id="host-list"></div>
+        <div id="log-box">
+          <div id="logs"></div>
+        </div>
+      </section>
+    </section>
   </body>
 </html>
