@@ -13,6 +13,10 @@
 * {
   box-sizing: border-box;
 }
+/* a[target="_blank"]::after {
+  content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+  margin-left: var(--space_2);
+} */
 .hosts {
   position: relative;
   height: 100%;
@@ -104,17 +108,21 @@ header {
   cursor: pointer;
   margin-bottom: auto;
 }
-
 .host .close::before {
-  content: "×";
-}
-
-.host.local .close {
-  cursor: pointer;
-}
-.host.local .close::before {
   content: "⦻";
   color: red;
+}
+
+.claim-host {
+  display: none;
+}
+
+.unclaimed .claim-host {
+  display: inline-block;
+}
+
+.unclaimed :is(.update-function, .set-file-handler, .close) {
+  display: none;
 }
 
 main button {

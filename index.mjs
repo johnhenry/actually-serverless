@@ -3,8 +3,10 @@ import * as Utils from "./utils.js";
 import defaultHandler, { defaultExportStr } from "./default-handler.mjs";
 import setStrategy from "./set-strategy.mjs";
 import setFileHandler from "./set-file-handler.mjs";
-import removeFileHandler from "./remove-file-handler.mjs";
+// import removeFileHandler from "./remove-file-handler.mjs";
+import releaseHost from "./release-host.mjs";
 import setFunction from "./set-function.mjs";
+// import setTakeover from "./set-takeover.mjs";
 import createFunctionHandler from "./createFunctionHandler.mjs";
 import noFSHandler from "./no-fs-handler.mjs";
 
@@ -28,12 +30,10 @@ const hostsUpdated = (event) => {
         .replaceAll("$HOST_ID", host)
         .replaceAll("$FUNCTION_TEXT", hosts[host].funcText ?? defaultExportStr)
         .trim();
-      //TODO set close button to "remove-hose"
+      setFunction(div.firstChild, hosts);
     } else {
       div.innerHTML = template.replaceAll("$HOST_ID", host).trim();
-      div.firstChild.querySelector(`textarea`).style.display = "none";
-      div.firstChild.querySelector(`button`).style.display = "none";
-      //TODO set close button to "claim-host"
+      div.firstChild.classList.add("unclaimed");
     }
     div.firstChild.querySelector(`.${strategy}`).classList.add("selected");
 
@@ -41,6 +41,7 @@ const hostsUpdated = (event) => {
   }
 };
 const hostRemoved = (event) => {};
+const clusterTakenover = () => window.location.reload();
 const clientAdded = async (event) => {
   if (event.data.backup && event.data.backup.length) {
     for (const [host, { fs, funcText }] of event.data.backup) {
@@ -51,6 +52,8 @@ const clientAdded = async (event) => {
       };
     }
   }
+  const { index, total } = event.data;
+  document.getElementById("client-index").innerText = `${index}/${total}`;
   hostsUpdated(event);
 };
 const logs = [];
@@ -58,24 +61,25 @@ const renderLogs = (log, logs, logElement) => {
   if (logs) {
     logs.push(log);
   }
+  const date = new Date().toISOString();
   if (logElement) {
     const div = document.createElement("div");
     div.classList.add(log.kind);
     switch (log.kind) {
       case "request":
-        div.innerText += `[${log.date}] ${log.host}: ${log.method} ${log.path}`;
+        div.innerText += `[${date}] ${log.host}: ${log.method} ${log.path}`;
         break;
       case "response":
         if (!log.ok) {
           div.classList.add("notok");
         }
-        div.innerText += `[${log.date}] ${log.host}: ${log.path} ${log.status} ${log.statusText}`;
+        div.innerText += `[${date}] ${log.host}: ${log.path} ${log.status} ${log.statusText}`;
         break;
       case "error":
-        div.innerText += `[${log.date}] ${log.host} ${log.path} ${log.message} `;
+        div.innerText += `[${date}] ${log.host} ${log.path} ${log.message} `;
         break;
       case "log":
-        div.innerText += `[${log.date}] ${log.host} ${log.message} `;
+        div.innerText += `[${date}] ${log.host} ${log.message} `;
         break;
     }
     logElement.append(div);
@@ -90,7 +94,6 @@ const consoleLog =
       {
         kind: "log",
         host,
-        date: new Date(),
         message: items.join(" "),
       },
       logs,
@@ -114,7 +117,6 @@ const handleFetch = async (event) => {
         kind: "request",
         id,
         host: event.data.host,
-        date: new Date(),
         method: request.method,
         path: new URL(request.url).pathname,
       },
@@ -136,7 +138,6 @@ const handleFetch = async (event) => {
           kind: "response",
           id,
           host: event.data.host,
-          date: new Date(),
           status: response.status,
           ok: response.ok,
           statusText: response.statusText,
@@ -164,7 +165,6 @@ const handleFetch = async (event) => {
         kind: "error",
         id,
         host: event.data.host,
-        date: new Date(),
         error: error.message,
       },
       logs,
@@ -192,6 +192,9 @@ navigator.serviceWorker.addEventListener("message", (event) => {
     case "host-removed":
       hostRemoved(event);
       break;
+    case "cluster-takenover":
+      clusterTakenover(event);
+      break;
     case "fetch":
       handleFetch(event);
       break;
@@ -209,21 +212,19 @@ document.body.addEventListener("click", (event) => {
         setStrategy(host, target.dataset.strategy);
       } else if (target.classList.contains("set-file-handler")) {
         setFileHandler(host, hosts);
+      } else if (target.classList.contains("release-host")) {
+        releaseHost(host, hosts);
+      } else if (target.classList.contains("claim-host")) {
+        hosts[host.id] = hosts[host.id] || { fetch: defaultHandler };
+        Utils.PostToSW({
+          type: "claim-host",
+          host: host.id,
+        });
       }
     }
   }
 });
-document.body.addEventListener("dblclick", (event) => {
-  if (event.target) {
-    const { target } = event;
-    const host = target.closest(".host");
-    if (host) {
-      if (target.classList.contains("set-file-handler")) {
-        removeFileHandler(host, hosts);
-      }
-    }
-  }
-});
+
 document.body.addEventListener("input", (event) => {
   if (event.target) {
     const { target } = event;
@@ -237,7 +238,9 @@ document.body.addEventListener("input", (event) => {
 });
 
 document.getElementById("add-host").addEventListener("click", () => {
-  const host = prompt("Add Host:", "exuberant-solitude" || randomName());
+  const host = document.getElementById("random-hostname").checked
+    ? randomName()
+    : prompt("Add Host:");
   if (host) {
     hosts[host] = hosts[host] || { fetch: defaultHandler };
     Utils.PostToSW({
@@ -246,6 +249,7 @@ document.getElementById("add-host").addEventListener("click", () => {
     });
   }
 });
+// TODO: I don't think this always unloas properly -- especially when refreshing... possibly before sw is ready?
 window.addEventListener("unload", () => {
   Utils.PostToSW({
     type: "remove-client",

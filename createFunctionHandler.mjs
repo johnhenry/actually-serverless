@@ -12,6 +12,7 @@ export default async (str = defaultExportStr) => {
       )
     ).default;
   } catch (error) {
-    return () => new Response("Malformed Function", { status: 500 });
+    return () =>
+      new Response(`Malformed Function:${error.message}`, { status: 500 });
   }
 };

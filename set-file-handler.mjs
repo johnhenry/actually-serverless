@@ -6,7 +6,7 @@ export default async (host, hosts) => {
   const item = hosts[host.id];
   item.fileHandler = fetch;
   item.fs = name;
-  host.querySelector(".set-file-handler").innerHTML = `📁 (${name})`;
+  host.querySelector(".set-file-handler").innerHTML = `📁 ${name}`;
   Utils.PostToSW({
     type: "backup-client",
     host: host.id,

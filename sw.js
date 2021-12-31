@@ -1,6 +1,7 @@
-// Storage methods using idb-keyval
+// import IDBKeyVal from "./idb-keyval.mjs";
 importScripts("idb-keyval.js");
 
+// Storage methods using idb-keyval
 const idbkvStore = IDBKeyVal.createStore(
   "service-worker-db",
   "service-worker-store"
@@ -41,9 +42,11 @@ self.addEventListener("activate", (event) => {
 
 const postToClients = async (messsage) => {
   const clients = (await storageGet("clients")) || [];
+  let index = 0;
   for (const id of clients) {
     const client = await self.clients.get(id);
-    client.postMessage(messsage);
+    client.postMessage({ ...messsage, index });
+    index++;
   }
 };
 const addClient = async (event) => {
@@ -70,9 +73,21 @@ const addClient = async (event) => {
   event.source.postMessage({
     type: "client-added",
     index,
+    total: clients.length,
     backup,
     strategies,
   });
+  for (let i = 0; i < clients.length; i++) {
+    if (i !== index) {
+      const client = await self.clients.get(clients[i]);
+      client.postMessage({
+        type: "client-added",
+        index: i,
+        total: clients.length,
+        strategies,
+      });
+    }
+  }
 };
 const removeClient = async (event) => {
   const clients = (await storageGet("clients")) || [];
@@ -99,7 +114,7 @@ const claimHost = async (event) => {
     hosts[host].push(index);
   }
   storageSet("hosts", hosts);
-  event.source.postMessage({
+  postToClients({
     type: "hosts-updated",
     strategies,
   });
@@ -115,12 +130,13 @@ const releaseHost = async (event) => {
   if (deleteIndex !== -1) {
     hosts[host].splice(deleteIndex, 1);
   }
+  await storageSet("hosts", hosts);
   const strategies = (await storageGet("strategies")) || {};
-  if (!host.length) {
+  if (!hosts[host].length) {
     delete strategies[host];
     await storageSet("strategies");
   }
-  event.source.postMessage({
+  postToClients({
     type: "hosts-updated",
     strategies,
   });
@@ -138,6 +154,7 @@ const setStrategy = async (event) => {
 };
 const backupClient = async (event) => {
   const clients = (await storageGet("clients")) || [];
+  console.log("BACKUP", event.data.data);
   await storageSet(
     `backup/${event.data.host}/${clients.indexOf(event.source.id)}`,
     event.data.data

@@ -25,11 +25,14 @@
           >$HOST_ID/</a
         >
         <button class="set-file-handler">📁</button>
-        <span class="close"></span>
+        <button class="claim-host">+</button>
+
+        <span class="release-host close"></span>
       </main>
       <textarea
         class="update-function"
-        placeholder="Click 📁 to serve a folder or add some code here to modify a request."
+        placeholder="Click 📁 to serve a folder or add some code here to modify a request.
+Double-lick to load file."
       >
 $FUNCTION_TEXT</textarea
       >
@@ -42,7 +45,10 @@ $FUNCTION_TEXT</textarea
     <title>Serve folder for web development</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="index.css" />
-    <script src="idb-keyval.js" defer></script>
+    <script type="module">
+      import IDBKeyVal from "./idb-keyval.mjs";
+      window.IDBKeyVal = IDBKeyVal;
+    </script>
     <script src="index.mjs" type="module"></script>
   </head>
   <body>
@@ -59,7 +65,18 @@ $FUNCTION_TEXT</textarea
       <section id="environment" class="view">e</section>
       <section id="about" class="view">a</section>
       <section id="hosts" class="view hosts">
-        <button id="add-host">Add Host</button>
+        <span
+          >Client: <span id="client-index"></span
+          ><a href="." target="_blank"> +</a></span
+        >
+        <span>
+          <button id="add-host">New Host</button>
+          <label>
+            <input type="checkbox" id="random-hostname" checked />
+            Random Name
+          </label>
+        </span>
+
         <div id="host-list"></div>
         <div id="log-box">
           <div id="logs"></div>
