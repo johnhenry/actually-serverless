@@ -1,3 +1,14 @@
+// clientId:string
+
+// hosts = {[hostname:string]:number?[]}
+// hostname:string => number[]
+
+// clients = clientIds:string?[]
+// [index]:number => clientId:string?
+
+// strategies
+// hostName:string => strategy:string
+
 // import IDBKeyVal from "./idb-keyval.mjs";
 importScripts("idb-keyval.js");
 
@@ -27,15 +38,34 @@ function storageClear() {
   return IDBKeyVal.clear(idbkvStore);
 }
 
+const DEFAULT_SETTINGS = {
+  varcontext: true,
+  varglobal: true,
+  theme: "auto",
+};
+const DEFAULT_STATE = {
+  settings: DEFAULT_SETTINGS,
+  hosts: {},
+  clients: [],
+  strategies: {},
+  environment: {},
+  backup: {},
+};
+const getState = async () => {
+  return storageGet("state") || DEFAULT_STATE;
+};
+const setState = async (state) => {
+  if (!state || !typeof state === "object") {
+    throw new Error("Invalid state");
+  }
+};
 // Install & activate
 self.addEventListener("install", (e) => {
-  console.log("[SW] install");
   // Skip waiting to ensure files can be served on first run
   e.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener("activate", (event) => {
-  console.log("[SW] activate");
   // On activation, claim all clients so we can start serving files on first run
   event.waitUntil(clients.claim());
 });
@@ -60,7 +90,7 @@ const addClient = async (event) => {
   }
   index++;
   clients[index] = event.source.id;
-  storageSet("clients", clients);
+  await storageSet("clients", clients);
   const backup = [];
   const strategies = (await storageGet("strategies")) || {};
 
@@ -70,11 +100,15 @@ const addClient = async (event) => {
       backup.push([key, data]);
     }
   }
+  const environment = (await storageGet("environment")) || {};
+  const settings = (await storageGet("settings")) || DEFAULT_SETTINGS;
   event.source.postMessage({
     type: "clients-updated",
     index,
     total: clients.length,
     backup,
+    environment,
+    settings,
     strategies,
   });
   for (let i = 0; i < clients.length; i++) {
@@ -84,6 +118,8 @@ const addClient = async (event) => {
         type: "clients-updated",
         index: i,
         total: clients.length,
+        environment,
+        settings,
         strategies,
       });
     }
@@ -101,7 +137,7 @@ const removeClient = async (event) => {
   } else {
     clients.splice(index, 1);
   }
-  storageSet("clients", clients);
+  await storageSet("clients", clients);
   const strategies = (await storageGet("strategies")) || {};
   for (let i = 0; i < clients.length; i++) {
     if (i !== index) {
@@ -117,7 +153,6 @@ const removeClient = async (event) => {
 };
 
 const claimHost = async (event) => {
-  console.log("[SW] claimHost", event);
   // // If there is only 1 client, clear the SW storage, as a simple garbage collection
   // // mechanism so we don't risk clogging up storage with dead hosts
   // const allClients = await self.clients.matchAll();
@@ -151,7 +186,6 @@ const claimHost = async (event) => {
   });
 };
 const releaseHost = async (event) => {
-  console.log("[SW] releaseHost", event);
   const { host } = event.data;
   const clients = (await storageGet("clients")) || [];
   const index = clients.indexOf(event.source.id);
@@ -177,7 +211,7 @@ const setStrategy = async (event) => {
   // Tell client it's now hosting.
   const strategies = (await storageGet("strategies")) || {};
   strategies[host] = kind;
-  storageSet("strategies", strategies);
+  await storageSet("strategies", strategies);
   postToClients({
     type: "hosts-updated",
     strategies,
@@ -190,10 +224,64 @@ const backupClient = async (event) => {
     event.data.data
   );
 };
+const setEnvironment = async (event) => {
+  let vars = {};
+  let varserrormessage;
+  const { environment: varstext } = event.data;
+  const varstringArray = [];
+  try {
+    varstext
+      .trim()
+      .split("\n")
+      .forEach((rawvar) => {
+        const [key, protovalue] = rawvar.split("=").map((v) => v.trim());
+        if (!key) return;
+        if (protovalue in vars) {
+          vars[key] = vars[protovalue];
+        } else {
+          switch (protovalue) {
+            case "undefined":
+            case "":
+              vars[key] = undefined;
+              break;
+            default:
+              vars[key] = JSON.parse(protovalue);
+          }
+        }
+      });
+  } catch (e) {
+    console.error("Error Parsing Environment Variables", e);
+    varserrormessage = e.message;
+    vars = {};
+  }
+  for (const [key, value] of Object.entries(vars)) {
+    varstringArray.push(`const ${key} = ${JSON.stringify(value)};`);
+  }
+  const varstring = varstringArray.join("\n");
+  const environment = {
+    varstext,
+    vars,
+    varstring,
+    varserrormessage,
+  };
+  await storageSet("environment", environment);
+  postToClients({
+    type: "environment-set",
+    environment,
+  });
+};
+
+const setSettings = async (event) => {
+  const { settings } = event.data;
+  await storageSet("settings", settings);
+  postToClients({
+    type: "settings-set",
+    settings,
+  });
+};
 
 // Listen for messages from clients
 self.addEventListener("message", (e) => {
-  console.log("[SW] got message", e);
   switch (e.data.type) {
     case "add-client":
       e.waitUntil(addClient(e));
@@ -212,6 +300,12 @@ self.addEventListener("message", (e) => {
       break;
     case "backup-client":
       e.waitUntil(backupClient(e));
+      break;
+    case "set-environment":
+      e.waitUntil(setEnvironment(e));
+      break;
+    case "set-settings":
+      e.waitUntil(setSettings(e));
       break;
     default:
       console.log("[SW] unknown message type", e.data.type);
@@ -236,20 +330,28 @@ const getClient = async (host) => {
   switch (strategy) {
     case "random":
       {
-        id = ids[Math.floor(Math.random() * ids.length)];
+        const index = Math.floor(Math.random() * ids.length);
+        id = ids[index];
+        await storageSet(
+          `strategy-next-index-${host}`,
+          (index + 1) % ids.length
+        );
       }
       break;
     case "round-robin":
       {
-        const index = (await storageGet(`round-robin-index-for-${host}`)) || 0;
+        const index = (await storageGet(`strategy-next-index-${host}`)) || 0;
         id = ids[index];
-        storageSet(`round-robin-index-for-${host}`, (index + 1) % ids.length);
+        await storageSet(
+          `strategy-next-index-${host}`,
+          (index + 1) % ids.length
+        );
       }
       break;
-    case "recent":
+    case "last-used":
       {
         const index =
-          ((await storageGet(`round-robin-index-for-${host}`)) || 0) - 1;
+          ((await storageGet(`strategy-next-index-${host}`)) || 0) - 1;
         id = ids[index !== -1 ? index : ids.length - 1];
       }
       break;
@@ -263,6 +365,7 @@ const getClient = async (host) => {
 };
 
 const HostFetch = async (host, url, request) => {
+  const id = `${host}-${Math.floor(1000000000 * Math.random())}`;
   try {
     const client = await getClient(host);
     if (!client) {
@@ -289,9 +392,7 @@ const HostFetch = async (host, url, request) => {
             new Response(body, {
               status,
               statusText,
-              headers: Object.fromEntries(
-                headers.concat([["Via", `HTTP/1.1 ${host}`]])
-              ),
+              headers: Object.fromEntries(headers),
             })
           );
         } else {
@@ -303,7 +404,7 @@ const HostFetch = async (host, url, request) => {
     const psuedoRequest = {
       url,
       method,
-      headers: [...headers.entries()].concat([["Via", `HTTP/1.1 ${host}`]]),
+      headers: [...headers.entries()].concat([["via", `HTTP/1.1 ${host}`]]),
     };
     const objs = [messageChannel.port2];
     if (body.byteLength) {
@@ -315,7 +416,7 @@ const HostFetch = async (host, url, request) => {
         type: "fetch",
         host,
         port: messageChannel.port2,
-        id: Math.floor(1000000 * Math.random()),
+        id,
         psuedoRequest,
       },
       objs
@@ -326,7 +427,7 @@ const HostFetch = async (host, url, request) => {
     return new Response(error, {
       status: 500,
       statusText: "Internal Server Error",
-      headers: { "Content-Type": "text/plain" },
+      headers: { "Content-Type": "text/plain", "x-resid": id },
     });
   }
 };

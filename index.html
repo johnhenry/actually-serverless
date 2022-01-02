@@ -10,6 +10,12 @@
         >
         </span>
         <span
+          class="set-strategy circ last-used"
+          title="select strategy: last-used"
+          data-strategy="last-used"
+        >
+        </span>
+        <span
           class="set-strategy circ round-robin"
           title="select strategy: round-robin"
           data-strategy="round-robin"
@@ -21,15 +27,12 @@
           data-strategy="random"
         >
         </span>
-        <span
-          class="set-strategy circ recent"
-          title="select strategy: recent"
-          data-strategy="recent"
-        >
-        </span>
         <a href="./host/$HOST_ID/" target="_blank" title="host/$HOST_ID"
           >$HOST_ID/</a
         >
+
+        <button onclick="" class="load-function-file">𝑓</button>
+
         <button class="set-file-handler">📁</button>
         <button class="claim-host">+</button>
 
@@ -65,8 +68,9 @@ $FUNCTION_TEXT</textarea
     <header>
       <a title="hosts" href="#">Hosts</a>
       <a title="requests" href="#requests">Requests</a>
-      <a title="settings" href="#settings">Settings</a>
       <a title="environment" href="#environment">Environment</a>
+      <a title="logs" href="#logs">Logs</a>
+      <a title="settings" href="#settings">Settings</a>
       <a title="about" href="#about">About</a>
       <span
         >Client: <span id="client-index"></span
@@ -74,48 +78,115 @@ $FUNCTION_TEXT</textarea
       >
     </header>
     <section class="pages">
-      <section id="requests" class="view">r</section>
-      <section id="settings" class="view">s</section>
-      <section id="environment" class="view">e</section>
+      <section id="requests" class="view">
+        <h2>Requests</h2>
+        <div id="requests-form">
+          <span>
+            <input id="requests-method" placeholder="method" value="GET" />
+            <span>host/</span>
+            <select id="requests-hosts"></select
+            >/
+            <input id="requests-path" placeholder="path" value="" />
+            HTTP/1.1
+          </span>
+          <textarea
+            id="requests-headers"
+            placeholder="content-type: text/plain
+accept: ...
+..."
+          ></textarea>
+          <textarea id="requests-body"></textarea>
+          <button id="requests-send">Send</button>
+        </div>
+        <div id="response-box">
+          <div id="responses"></div>
+        </div>
+      </section>
+
+      <section id="environment" class="view">
+        <h2>Environment</h2>
+        <textarea
+          id="environment-variables"
+          placeholder="VAR_0=val0
+VAR_1=val1
+..."
+        ></textarea>
+      </section>
+      <section id="settings" class="view">
+        <h2>Settings</h2>
+        <span>
+          Inject Variables :
+          <label>
+            context
+            <input type="checkbox" id="settings-variables-inject-context" />
+          </label>
+          <label>
+            global
+            <input type="checkbox" id="settings-variables-inject-global" />
+          </label>
+        </span>
+        <span>
+          Lighting:
+          <label>
+            auto
+            <input type="radio" name="settings-theme" value="auto" />
+          </label>
+          <label>
+            dark
+            <input type="radio" name="settings-theme" value="dark" />
+          </label>
+          <label>
+            light
+            <input type="radio" name="settings-theme" value="light" />
+          </label>
+        </span>
+      </section>
       <section id="about" class="view">
-        <h2>What is this</h2>
-        <p></p>
-        <h2>Why is it useful</h2>
-        <p></p>
-        <h2>How does it work</h2>
-        <p></p>
-        <h2>Comparison to Serevefolder.dev</h2>
-        <p>
-          This is a fork of
+        <h2>About</h2>
+        <div>
+          <h3>What is this</h3>
+          <p></p>
+          <h3>Why is it useful</h3>
+          <p></p>
+          <h3>How does it work</h3>
+          <p></p>
+          <h3>Comparison to Serevefolder.dev</h3>
+          <p>
+            This is a fork of
+            <a
+              href="https://github.com/AshleyScirra/servefolder.dev"
+              target="_blank"
+              >servefolder.dev</a
+            >
 
-          <a
-            href="https://github.com/AshleyScirra/servefolder.dev"
-            target="_blank"
-            >servefolder.dev</a
-          >
-
-          <a href="https://servefolder.dev/" target="_blank">(hosted here)</a>,
-          so comparisons are welcome.
-        </p>
-        <table class="comparison-table">
-          <tr>
-            <th>Feature</th>
-            <th>Servefolder.dev</th>
-            <th>LocalCluster.dev</th>
-          </tr>
-          <tr>
-            <td>Cloud Functions</td>
-            <td>𐄂</td>
-            <td class="clear-winner">✓</td>
-          </tr>
-          <tr>
-            <td>Browser Compatibility</td>
-            <td>Chrome, Firefox, Safari</td>
-            <td>Chrome</td>
-          </tr>
-        </table>
+            <a href="https://servefolder.dev/" target="_blank">(hosted here)</a
+            >, so comparisons are welcome.
+          </p>
+          <table class="comparison-table">
+            <tr>
+              <th>Feature</th>
+              <th>Servefolder.dev</th>
+              <th>LocalCluster.dev</th>
+            </tr>
+            <tr>
+              <td>Cloud Functions</td>
+              <td>𐄂</td>
+              <td class="clear-winner">✓</td>
+            </tr>
+            <tr>
+              <td>Browser Compatibility</td>
+              <td>Chrome, Firefox, Safari</td>
+              <td>Chrome</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+      <section id="logs" class="view">
+        <h2>Logs</h2>
+        <div id="log-box"></div>
       </section>
       <section id="hosts" class="view hosts">
+        <h2>Hosts</h2>
         <span>
           <button id="add-host">New Host</button>
           <label>
@@ -123,10 +194,8 @@ $FUNCTION_TEXT</textarea
             Random Name
           </label>
         </span>
+        <input type="file" id="select-file" style="display: none" />
         <div id="host-list"></div>
-        <div id="log-box">
-          <div id="logs"></div>
-        </div>
       </section>
     </section>
   </body>

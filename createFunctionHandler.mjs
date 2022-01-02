@@ -1,11 +1,12 @@
 import { defaultExportStr } from "./default-handler.mjs";
 
-export default async (str = defaultExportStr) => {
+export default async (str = defaultExportStr, preamble = "") => {
   try {
+    const body = preamble ? preamble + "\n" + str : str;
     return (
       await import(
         URL.createObjectURL(
-          new Blob([str], {
+          new Blob([body], {
             type: "application/javascript",
           })
         )
