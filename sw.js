@@ -38,26 +38,26 @@ function storageClear() {
   return IDBKeyVal.clear(idbkvStore);
 }
 
-const DEFAULT_SETTINGS = {
-  varcontext: true,
-  varglobal: true,
-  theme: "auto",
-};
-const DEFAULT_STATE = {
-  settings: DEFAULT_SETTINGS,
-  hosts: {},
-  clients: [],
-  strategies: {},
-  environment: {},
-  backup: {},
-};
+const DEFAULT_STATE = () => ({
+  settings: {
+    varcontext: true,
+    varglobal: true,
+    theme: "auto",
+    randomHostName: true,
+  }, //{varcontext, varglobal, theme, randomHostName}
+  nextStrategy: {}, //{[hostname:string]:string}
+  hosts: {}, //{[hostname:string]:number?[]}
+  clients: [], //[index]:number => clientId:string?
+  strategies: {}, //hostName:string => strategy:string
+  environment: {}, //{[key:string]:string}
+  backup: {}, //{[key:string]:string}
+});
 const getState = async () => {
-  return storageGet("state") || DEFAULT_STATE;
+  const state = (await storageGet("state")) || DEFAULT_STATE();
+  return state;
 };
-const setState = async (state) => {
-  if (!state || !typeof state === "object") {
-    throw new Error("Invalid state");
-  }
+const setState = async (state = DEFAULT_STATE()) => {
+  await storageSet("state", state);
 };
 // Install & activate
 self.addEventListener("install", (e) => {
@@ -71,7 +71,7 @@ self.addEventListener("activate", (event) => {
 });
 
 const postToClients = async (messsage) => {
-  const clients = (await storageGet("clients")) || [];
+  const { clients } = await getState();
   let index = 0;
   for (const id of clients) {
     const client = await self.clients.get(id);
@@ -80,7 +80,8 @@ const postToClients = async (messsage) => {
   }
 };
 const addClient = async (event) => {
-  const clients = (await storageGet("clients")) || [];
+  const state = await getState();
+  const { clients, strategies, environment, settings, backup } = state;
   let index = -1;
   for (const value of clients) {
     if (value === null) {
@@ -90,23 +91,20 @@ const addClient = async (event) => {
   }
   index++;
   clients[index] = event.source.id;
-  await storageSet("clients", clients);
-  const backup = [];
-  const strategies = (await storageGet("strategies")) || {};
+  const backups = [];
+  await setState(state);
 
   for (const [key, value] of Object.entries(strategies)) {
-    const data = await storageGet(`backup/${key}/${index}`, event.data.data);
+    const data = backup[key]?.[index];
     if (data) {
-      backup.push([key, data]);
+      backups.push([key, data]);
     }
   }
-  const environment = (await storageGet("environment")) || {};
-  const settings = (await storageGet("settings")) || DEFAULT_SETTINGS;
   event.source.postMessage({
     type: "clients-updated",
     index,
     total: clients.length,
-    backup,
+    backups,
     environment,
     settings,
     strategies,
@@ -126,9 +124,10 @@ const addClient = async (event) => {
   }
 };
 const removeClient = async (event) => {
-  const clients = (await storageGet("clients")) || [];
+  const state = await getState();
+  const { clients, hosts, strategies } = state;
   const index = clients.indexOf(event.source.id);
-  const hosts = (await storageGet("hosts")) || {};
+
   const entries = [...Object.entries(hosts)].reduce((previous, current) => {
     return previous.concat(current[1]);
   }, []);
@@ -137,8 +136,7 @@ const removeClient = async (event) => {
   } else {
     clients.splice(index, 1);
   }
-  await storageSet("clients", clients);
-  const strategies = (await storageGet("strategies")) || {};
+  await setState(state);
   for (let i = 0; i < clients.length; i++) {
     if (i !== index) {
       const client = await self.clients.get(clients[i]);
@@ -157,19 +155,17 @@ const claimHost = async (event) => {
   // // mechanism so we don't risk clogging up storage with dead hosts
   // const allClients = await self.clients.matchAll();
   // if (allClients.length <= 1) await storageClear();
+  const state = await getState();
+  const { clients, hosts, strategies } = state;
   const { host } = event.data;
   // Tell client it's now hosting.
-
-  const clients = (await storageGet("clients")) || [];
   const index = clients.indexOf(event.source.id);
-  const hosts = (await storageGet("hosts")) || {};
+
   hosts[host] = hosts[host] || [];
   const hostLength = hosts[host].length;
   if (!hosts[host].includes(index)) {
     hosts[host].push(index);
   }
-  await storageSet("hosts", hosts);
-  const strategies = (await storageGet("strategies")) || {};
   strategies[host] = strategies[host] || "first";
   if (
     strategies[host] === "first" &&
@@ -178,51 +174,51 @@ const claimHost = async (event) => {
   ) {
     strategies[host] = "round-robin";
   }
-  await storageSet("strategies", strategies);
-
+  await setState(state);
   postToClients({
     type: "hosts-updated",
     strategies,
   });
 };
 const releaseHost = async (event) => {
+  const state = await getState();
+  const { clients, hosts, strategies } = state;
   const { host } = event.data;
-  const clients = (await storageGet("clients")) || [];
   const index = clients.indexOf(event.source.id);
-  const hosts = (await storageGet("hosts")) || {};
   hosts[host] = hosts[host] || [];
   const deleteIndex = hosts[host].indexOf(index);
   if (deleteIndex !== -1) {
     hosts[host].splice(deleteIndex, 1);
   }
-  await storageSet("hosts", hosts);
-  const strategies = (await storageGet("strategies")) || {};
   if (!hosts[host].length) {
     delete strategies[host];
-    await storageSet("strategies");
   }
+  await setState(state);
   postToClients({
     type: "hosts-updated",
     strategies,
   });
 };
 const setStrategy = async (event) => {
+  const state = await getState();
+  const { clients, hosts, strategies } = state;
   const { host, kind = "first" } = event.data;
   // Tell client it's now hosting.
-  const strategies = (await storageGet("strategies")) || {};
   strategies[host] = kind;
-  await storageSet("strategies", strategies);
+  await setState(state);
   postToClients({
     type: "hosts-updated",
     strategies,
   });
 };
 const backupClient = async (event) => {
-  const clients = (await storageGet("clients")) || [];
-  await storageSet(
-    `backup/${event.data.host}/${clients.indexOf(event.source.id)}`,
-    event.data.data
-  );
+  const state = await getState();
+  const { clients, backup } = state;
+  const { host } = event.data;
+  backup[host] = backup[host] || [];
+  const index = clients.indexOf(event.source.id);
+  backup[host][index] = event.data.data;
+  await setState(state);
 };
 const setEnvironment = async (event) => {
   let vars = {};
@@ -264,7 +260,9 @@ const setEnvironment = async (event) => {
     varstring,
     varserrormessage,
   };
-  await storageSet("environment", environment);
+  const state = await getState();
+  state.environment = environment;
+  await setState(state);
   postToClients({
     type: "environment-set",
     environment,
@@ -273,7 +271,9 @@ const setEnvironment = async (event) => {
 
 const setSettings = async (event) => {
   const { settings } = event.data;
-  await storageSet("settings", settings);
+  const state = await getState();
+  state.settings = settings;
+  await setState(state);
   postToClients({
     type: "settings-set",
     settings,
@@ -307,65 +307,61 @@ self.addEventListener("message", (e) => {
     case "set-settings":
       e.waitUntil(setSettings(e));
       break;
+    case "reload-cluster":
+      e.waitUntil(reloadCluster(e));
+      break;
     default:
       console.log("[SW] unknown message type", e.data.type);
   }
 });
 
 const getClient = async (host) => {
-  const hosts = (await storageGet("hosts")) || {};
+  const state = await getState();
+  const { hosts, clients, strategies, nextStrategy } = state;
+
+  if (!clients) {
+    throw new Error(`No clients registered.`);
+  }
   const registeredClients = hosts[host];
   if (!registeredClients) {
     throw new Error(`host not recognized: "${host}"`);
   }
-  const clients = (await storageGet("clients")) || [];
-  if (!clients) {
-    throw new Error(`No clients registered for host: ${host}`);
-  }
   const clientIds = registeredClients.map((index) => clients[index]);
   const ids = clientIds.filter((id) => id !== null);
-  const strategies = (await storageGet("strategies")) || {};
   const strategy = strategies[host];
-  let id;
+  let index;
   switch (strategy) {
     case "random":
       {
-        const index = Math.floor(Math.random() * ids.length);
-        id = ids[index];
-        await storageSet(
-          `strategy-next-index-${host}`,
-          (index + 1) % ids.length
-        );
+        index = Math.floor(Math.random() * ids.length);
+        nextStrategy[host] = (index + 1) % ids.length;
+        await setState(state);
       }
       break;
     case "round-robin":
       {
-        const index = (await storageGet(`strategy-next-index-${host}`)) || 0;
-        id = ids[index];
-        await storageSet(
-          `strategy-next-index-${host}`,
-          (index + 1) % ids.length
-        );
+        index = nextStrategy[host] || 0;
+        nextStrategy[host] = (index + 1) % ids.length;
+        await setState(state);
       }
       break;
     case "last-used":
       {
-        const index =
-          ((await storageGet(`strategy-next-index-${host}`)) || 0) - 1;
-        id = ids[index !== -1 ? index : ids.length - 1];
+        index = (nextStrategy[host] || 0) - 1;
       }
       break;
     case "first":
     default: {
-      id = ids[0];
+      index = 0;
     }
   }
+  const id = ids[index !== -1 ? index : ids.length - 1];
   const client = await self.clients.get(id);
   return client;
 };
 
 const HostFetch = async (host, url, request) => {
-  const id = `${host}-${Math.floor(1000000000 * Math.random())}`;
+  const id = `${Math.floor(1000000000 * Math.random())}`;
   try {
     const client = await getClient(host);
     if (!client) {
@@ -431,29 +427,79 @@ const HostFetch = async (host, url, request) => {
     });
   }
 };
+const resetCluster = async () => {
+  const { settings } = await getState();
+  const state = DEFAULT_STATE();
+  state.settings = settings;
+  await setState(state);
+  const clients = await self.clients.matchAll();
+  for (const client of clients) {
+    client.postMessage({ type: "reload" });
+  }
+};
+const reloadCluster = async (event) => {
+  const { reset, preserveSettings, closeOthers } = event.data;
+  if (reset) {
+    const state = DEFAULT_STATE();
+    if (preserveSettings) {
+      const { settings } = await getState();
+      state.settings = settings;
+    }
+    await setState(state);
+  }
+  const clients = await self.clients.matchAll();
+
+  if (closeOthers) {
+    let me;
+    for (const client of clients) {
+      console.log({ client });
+
+      if (client.id === event.source.id) {
+        me = client;
+        console.log("match", client, event.source.id);
+        continue;
+      }
+      client.postMessage({ type: "close-window" });
+      client.postMessage({ type: "reload-window" });
+    }
+    me.postMessage({ type: "reload-window" });
+  } else {
+    for (const client of clients) {
+      client.postMessage({ type: "reload-window" });
+    }
+  }
+};
 
 // Main fetch event
-self.addEventListener("fetch", async (e) => {
+self.addEventListener("fetch", async (event) => {
   //TODO: Need to handle trailing shash after "host".
   // Request to different origin: pass-through
-  if (new URL(e.request.url).origin !== location.origin) {
+  if (new URL(event.request.url).origin !== location.origin) {
     return;
   }
   // Check request in SW scope - should always be the case but check anyway
   const swScope = self.registration.scope;
-  if (!e.request.url.startsWith(swScope)) {
+  if (!event.request.url.startsWith(swScope)) {
     return;
   }
 
-  const scopeRelativeUrl = e.request.url.substr(swScope.length);
+  const scopeRelativeUrl = event.request.url.substr(swScope.length);
   const scopeURLMatch = /host\/([^\/]+)\/?(.*)/.exec(scopeRelativeUrl);
   if (!scopeURLMatch) {
     return;
   } // not part of a host URL
-  // Strip host name from URL and get the URL within the host
-  const host = scopeURLMatch[1];
-  const hostRelativeUrl = scopeURLMatch[2];
-  //TODO e.data.url is just the first letter?
-  // Likely getting messed up within here or around host fetch.
-  e.respondWith(HostFetch(host, hostRelativeUrl, e.request));
+  const getHost = async () => {
+    const scopeRelativeUrl = event.request.url.substr(swScope.length);
+    const { strategies } = await getState();
+    for (const hostName of Object.keys(strategies).sort(
+      (a, b) => b.length - a.length
+    )) {
+      const beginner = `host/${hostName}/`;
+      if (scopeRelativeUrl.startsWith(beginner)) {
+        const hostRelativeUrl = scopeRelativeUrl.substr(beginner.length);
+        return HostFetch(hostName, hostRelativeUrl, event.request);
+      }
+    }
+  };
+  event.respondWith(getHost());
 });

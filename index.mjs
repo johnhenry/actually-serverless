@@ -50,8 +50,8 @@ const hostsUpdated = (event) => {
 const hostRemoved = (event) => {};
 const clientsUpdated = async (event) => {
   await settingsSet(event);
-  if (event.data.backup && event.data.backup.length) {
-    for (const [host, { fs, funcText }] of event.data.backup) {
+  if (event.data.backups && event.data.backups.length) {
+    for (const [host, { fs, funcText }] of event.data.backups) {
       hosts[host] = {
         fs,
         funcText,
@@ -86,7 +86,7 @@ const renderLogs = (log, logs, logElement) => {
         div.innerText += `[${date}][${log.host}] ${log.path} ${log.message}`;
         break;
       case "log":
-        div.innerText += `[${date}][${log.host}]  ${log.message}`;
+        div.innerText += `[${date}][${log.host}] ${log.message}`;
         break;
     }
     logElement.append(div);
@@ -97,6 +97,7 @@ const renderLogs = (log, logs, logElement) => {
 const consoleLog =
   (host) =>
   (...items) => {
+    console.log("HOST, HERE");
     renderLogs(
       {
         kind: "log",
@@ -119,7 +120,7 @@ const handleFetch = async (event) => {
       //TODO: May need more rhobust handling of converting entries to headers' object
       body,
     });
-
+    request.headers.append("x-reqid", `${event.data.host}`);
     request.headers.append("x-reqid", `${id}`);
     // Log Request
     renderLogs(
@@ -228,6 +229,8 @@ const settingsSet = async (event) => {
     `input[name="settings-theme"][value="${settings.theme}"]`
   ).checked = true;
 
+  document.getElementById("settings-random-hostname").checked =
+    settings.randomHostName;
   document.body.classList.remove("auto", "dark", "light");
   document.body.classList.add(settings.theme);
 };
@@ -252,6 +255,12 @@ navigator.serviceWorker.addEventListener("message", (event) => {
       break;
     case "fetch":
       handleFetch(event);
+      break;
+    case "reload-window":
+      globalThis.location.reload();
+      break;
+    case "close-window":
+      globalThis.close();
       break;
     default:
       console.warn(`Unknown message from SW '${event.data.type}'`);
@@ -308,7 +317,7 @@ document.body.addEventListener("input", (event) => {
 });
 
 document.getElementById("add-host").addEventListener("click", () => {
-  const host = document.getElementById("random-hostname").checked
+  const host = document.getElementById("settings-random-hostname").checked
     ? randomName()
     : prompt("Add Host:");
   if (host) {
@@ -319,6 +328,7 @@ document.getElementById("add-host").addEventListener("click", () => {
     });
   }
 });
+
 const responseElement = document.getElementById("responses");
 document.getElementById("requests-send").addEventListener("click", () => {
   const method = document.getElementById("requests-method").value.toLowerCase();
@@ -410,8 +420,7 @@ environmentElement.addEventListener("input", () => {
   });
 });
 
-const settingsElement = document.getElementById("settings");
-settingsElement.addEventListener("input", (event) => {
+const updateSettings = (event) => {
   const settings = {};
   settings.varcontext = document.getElementById(
     "settings-variables-inject-context"
@@ -422,13 +431,55 @@ settingsElement.addEventListener("input", (event) => {
   settings.theme = document.querySelector(
     'input[name="settings-theme"]:checked'
   ).value;
+  settings.randomHostName = document.getElementById(
+    "settings-random-hostname"
+  ).checked;
 
   Utils.PostToSW({
     type: "set-settings",
     settings,
   });
-});
+};
+const settingsElement = document.getElementById("settings");
+settingsElement.addEventListener("input", updateSettings);
+document
+  .getElementById("settings-random-hostname")
+  .addEventListener("input", updateSettings);
 
+document
+  .getElementById("settings-reload-cluster")
+  .addEventListener("click", () => {
+    if (confirm("Reload cluster? Data may be lost.")) {
+      Utils.PostToSW({
+        type: "reload-cluster",
+      });
+    }
+  });
+
+document
+  .getElementById("settings-reset-cluster")
+  .addEventListener("click", () => {
+    if (confirm("Reset cluster? Data WILL be lost!")) {
+      Utils.PostToSW({
+        type: "reload-cluster",
+        reset: true,
+        preserveSettings: true,
+      });
+    }
+  });
+
+document
+  .getElementById("settings-reset-cluster-and-close")
+  .addEventListener("click", () => {
+    if (confirm("Reset and close cluster? Data WILL be lost!!!")) {
+      Utils.PostToSW({
+        type: "reload-cluster",
+        reset: true,
+        preserveSettings: true,
+        closeOthers: true,
+      });
+    }
+  });
 // TODO: I don't think this always unloas properly -- especially when refreshing... possibly before sw is ready? Maybe use "beforeunload" instead?
 window.addEventListener("unload", (event) => {
   Utils.PostToSW({

@@ -2,6 +2,9 @@
   --color-background: white;
   --color-midground: grey;
   --color-foreground: black;
+  --space8: 64px;
+  --space4: 32px;
+  --space2: 16px;
   --space: 8px;
   --space2: 16px;
   --space4: 16px;
@@ -96,6 +99,18 @@ header span {
   overflow-y: scroll;
   flex: 1 1 auto;
 }
+#log-box .log {
+  color: skyblue;
+}
+#log-box .request {
+  color: grey;
+}
+#log-box .response {
+  color: green;
+}
+#log-box .response.notok {
+  color: orange;
+}
 
 .host {
   box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.5);
@@ -109,6 +124,12 @@ header span {
   gap: var(--space);
   align-items: center;
   min-height: calc(4 * var(--space));
+  align-content: stretch;
+}
+.host main button {
+  height: 100%;
+  line-height: 1.5;
+  vertical-align: middle;
 }
 .host textarea {
   border-top: none;
@@ -117,7 +138,7 @@ header span {
   resize: vertical;
   width: 100%;
   border-radius: none;
-  min-height: calc(12 * var(--space));
+  min-height: calc(16 * var(--space));
 }
 
 .host .close {
@@ -125,48 +146,41 @@ header span {
   margin-bottom: auto;
 }
 .host .close::before {
-  content: "⦻";
+  content: "×";
   color: red;
 }
-
-.claim-host {
-  display: none;
-}
-
-.unclaimed .claim-host {
-  display: inline-block;
-}
-
 .unclaimed
   :is(.update-function, .set-file-handler, .load-function-file, .close) {
   display: none;
 }
+.unclaimed .claim-host {
+  margin-left: auto;
+}
 
-.load-function-file,
-.claim-host {
+.load-function-file {
   margin-left: auto;
 }
 
 .circ {
   display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
   cursor: pointer;
-  background-color: var(--color-midground);
+  color: var(--color-midground);
+}
+.circ::before {
+  content: "●";
 }
 
 .circ.first.selected {
-  background-color: Crimson;
+  color: Crimson;
 }
 .circ.last-used.selected {
-  background-color: GoldenRod;
+  color: GoldenRod;
 }
 .circ.round-robin.selected {
-  background-color: ForestGreen;
+  color: ForestGreen;
 }
 .circ.random.selected {
-  background-color: DeepSkyBlue;
+  color: DeepSkyBlue;
 }
 
 .comparison-table,
@@ -205,4 +219,26 @@ header span {
 
 #response-box {
   overflow-y: scroll;
+}
+
+#responses {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space4);
+}
+
+#responses .preamble {
+  font-weight: bold;
+}
+
+#responses .request {
+  border-bottom: 1px dotted black;
+  color: grey;
+}
+#responses .response {
+  border-bottom: 1px dashed black;
+  color: green;
+}
+#responses .response.notok {
+  color: orange;
 }

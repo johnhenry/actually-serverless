@@ -27,7 +27,11 @@
           data-strategy="random"
         >
         </span>
-        <a href="./host/$HOST_ID/" target="_blank" title="host/$HOST_ID"
+        <a
+          href="./host/$HOST_ID/"
+          target="_blank"
+          rel="opener"
+          title="host/$HOST_ID"
           >$HOST_ID/</a
         >
 
@@ -35,7 +39,6 @@
 
         <button class="set-file-handler">📁</button>
         <button class="claim-host">+</button>
-
         <span class="release-host close"></span>
       </main>
       <textarea
@@ -190,9 +193,15 @@ VAR_1=val1
         <span>
           <button id="add-host">New Host</button>
           <label>
-            <input type="checkbox" id="random-hostname" checked />
+            <input type="checkbox" id="settings-random-hostname" />
             Random Name
           </label>
+          <button id="settings-reload-cluster">reload</button>
+          <button id="settings-reset-cluster">reset</button>
+          <button id="settings-reset-cluster-and-close">reset + close</button>
+          |
+          <button id="settings-download-backup">backup</button>
+          <button id="settings-upload-backup">restore</button>
         </span>
         <input type="file" id="select-file" style="display: none" />
         <div id="host-list"></div>
