@@ -104,6 +104,7 @@ const addClient = async (event) => {
     type: "clients-updated",
     index,
     total: clients.length,
+    state,
     backups,
     environment,
     settings,
@@ -116,6 +117,7 @@ const addClient = async (event) => {
         type: "clients-updated",
         index: i,
         total: clients.length,
+        state,
         environment,
         settings,
         strategies,
@@ -177,6 +179,7 @@ const claimHost = async (event) => {
   await setState(state);
   postToClients({
     type: "hosts-updated",
+    state,
     strategies,
   });
 };
@@ -219,6 +222,10 @@ const backupClient = async (event) => {
   const index = clients.indexOf(event.source.id);
   backup[host][index] = event.data.data;
   await setState(state);
+  postToClients({
+    type: "state-set",
+    state,
+  });
 };
 const setEnvironment = async (event) => {
   let vars = {};
@@ -440,7 +447,8 @@ const resetCluster = async () => {
 const reloadCluster = async (event) => {
   const { reset, preserveSettings, closeOthers } = event.data;
   if (reset) {
-    const state = DEFAULT_STATE();
+    const state =
+      typeof reset === "string" ? JSON.parse(reset) : DEFAULT_STATE();
     if (preserveSettings) {
       const { settings } = await getState();
       state.settings = settings;

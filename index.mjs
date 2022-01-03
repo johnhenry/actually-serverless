@@ -46,8 +46,19 @@ const hostsUpdated = (event) => {
 
     hostList.append(div.firstChild);
   }
+  stateSet(event);
 };
-const hostRemoved = (event) => {};
+const stateSet = async (event) => {
+  const { state } = event.data;
+  document
+    .getElementById("settings-download-save")
+    .setAttribute(
+      "href",
+      "data:text/plain;charset=utf-8, " +
+        encodeURIComponent(JSON.stringify(state || ""))
+    );
+};
+
 const clientsUpdated = async (event) => {
   await settingsSet(event);
   if (event.data.backups && event.data.backups.length) {
@@ -245,13 +256,13 @@ navigator.serviceWorker.addEventListener("message", (event) => {
     case "hosts-updated":
       hostsUpdated(event);
       break;
-    case "host-removed":
-      hostRemoved(event);
-      break;
     case "environment-set":
       environmentSet(event);
     case "settings-set":
       settingsSet(event);
+      break;
+    case "state-set":
+      stateSet(event);
       break;
     case "fetch":
       handleFetch(event);
@@ -480,6 +491,26 @@ document
       });
     }
   });
+
+document
+  .getElementById("settings-upload-save")
+  .addEventListener("click", () => {
+    const fileSelector = document.getElementById("select-file");
+    const onFileSelected = async (event) => {
+      fileSelector.removeEventListener("change", onFileSelected);
+      const { files } = event.target;
+      const reset = await files[files.length - 1].text();
+      Utils.PostToSW({
+        type: "reload-cluster",
+        reset,
+        preserveSettings: true,
+        closeOthers: false,
+      });
+    };
+    fileSelector.addEventListener("change", onFileSelected);
+    fileSelector.click();
+  });
+
 // TODO: I don't think this always unloas properly -- especially when refreshing... possibly before sw is ready? Maybe use "beforeunload" instead?
 window.addEventListener("unload", (event) => {
   Utils.PostToSW({
