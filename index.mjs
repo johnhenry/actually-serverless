@@ -112,7 +112,6 @@ const renderLogs = (log, logs, logElement) => {
 const consoleLog =
   (host) =>
   (...items) => {
-    console.log("HOST, HERE");
     renderLogs(
       {
         kind: "log",
@@ -228,7 +227,6 @@ const environmentSet = async (event) => {
     environmentElement.removeAttribute("title");
   }
   for (const [host, { fs, funcText }] of Object.entries(hosts)) {
-    console.log("S", settings.varglobal && environment.varstring);
     hosts[host].fetch = await createFunctionHandler(
       funcText ?? defaultExportStr,
       settings.varglobal && environment.varstring
@@ -237,7 +235,6 @@ const environmentSet = async (event) => {
 };
 
 const settingsSet = async (event) => {
-  await environmentSet(event);
   const { settings: newSettings = {} } = event.data;
   for (const [key, value] of Object.entries(newSettings)) {
     settings[key] = value;
@@ -316,7 +313,6 @@ document.body.addEventListener("click", (event) => {
           host.querySelector(".update-function").value = await files[
             files.length - 1
           ].text();
-          console.log(2, { settings });
           setFunction(host, hosts, settings.varglobal && environment.varstring);
         };
         fileSelector.addEventListener("change", onFileSelected);

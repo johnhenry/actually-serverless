@@ -477,7 +477,6 @@ const reloadCluster = async (event) => {
     for (const client of clients) {
       if (client.id === event.source.id) {
         me = client;
-        console.log("match", client, event.source.id);
         continue;
       }
       client.postMessage({ type: "close-window" });
