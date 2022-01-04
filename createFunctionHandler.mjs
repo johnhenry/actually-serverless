@@ -1,7 +1,6 @@
 import { defaultExportStr } from "./default-handler.mjs";
 
 export default async (str = defaultExportStr, preamble = "") => {
-  console.log({ str, preamble });
   try {
     const body = preamble ? preamble + "\n" + str : str;
 

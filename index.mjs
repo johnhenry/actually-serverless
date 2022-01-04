@@ -372,6 +372,9 @@ document.getElementById("requests-send").addEventListener("click", () => {
   if (!pathname.endsWith("/")) {
     pathname += "/";
   }
+  if (pathname.startsWith(window.location.pathname)) {
+    pathname = pathname.replace(window.location.pathname, "/");
+  }
   const sendBody = method === "get" || method === "head" ? undefined : body;
   const url = `${pathname}${host}/${path}`;
   const request = new Request(`./host${url}`, {
