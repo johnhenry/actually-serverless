@@ -244,11 +244,17 @@ const setEnvironment = async (event) => {
         } else {
           switch (protovalue) {
             case "undefined":
-            case "":
               vars[key] = undefined;
               break;
+            case "":
+              vars[key] = "";
+              break;
             default:
-              vars[key] = JSON.parse(protovalue);
+              try {
+                vars[key] = JSON.parse(protovalue);
+              } catch {
+                vars[key] = protovalue;
+              }
           }
         }
       });
@@ -445,10 +451,19 @@ const resetCluster = async () => {
   }
 };
 const reloadCluster = async (event) => {
-  const { reset, preserveSettings, closeOthers } = event.data;
+  const {
+    reset = false,
+    preserveSettings = true,
+    closeOthers = false,
+    resetClients = true,
+    reopenOthers = false,
+  } = event.data;
   if (reset) {
     const state =
       typeof reset === "string" ? JSON.parse(reset) : DEFAULT_STATE();
+    if (resetClients) {
+      state.clients.forEach((_, index) => (state.clients[index] = null));
+    }
     if (preserveSettings) {
       const { settings } = await getState();
       state.settings = settings;
@@ -456,25 +471,32 @@ const reloadCluster = async (event) => {
     await setState(state);
   }
   const clients = await self.clients.matchAll();
-
   if (closeOthers) {
+    // close all excepr window that aired
     let me;
     for (const client of clients) {
-      console.log({ client });
-
       if (client.id === event.source.id) {
         me = client;
         console.log("match", client, event.source.id);
         continue;
       }
       client.postMessage({ type: "close-window" });
-      client.postMessage({ type: "reload-window" });
     }
     me.postMessage({ type: "reload-window" });
   } else {
+    // reload all
     for (const client of clients) {
       client.postMessage({ type: "reload-window" });
     }
+    // if (reopenOthers) {
+    //   const { clients: stateClients } = await getState();
+    //   const closed = stateClients.length - clients.length;
+    //   let i = 0;
+    //   while (i < closed) {
+    //     const w = await self.clients.openWindow("/");
+    //     i++;
+    //   }
+    // }
   }
 };
 

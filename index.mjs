@@ -415,7 +415,7 @@ document.getElementById("requests-send").addEventListener("click", () => {
         responsePreview.innerText = await response.text();
     }
     responsePreview.classList.add("preview");
-    responsePreview.classList.add(contentType);
+    responsePreview.classList.add(encodeURI(contentType));
 
     responseDiv.appendChild(responsePreambleDiv);
     responseDiv.appendChild(responseHeadersDiv);
@@ -505,6 +505,7 @@ document
         reset,
         preserveSettings: true,
         closeOthers: false,
+        reopenOthers: true,
       });
     };
     fileSelector.addEventListener("change", onFileSelected);

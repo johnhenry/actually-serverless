@@ -58,8 +58,30 @@ $FUNCTION_TEXT</textarea
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css"
+      href="https://fonts.googleapis.com/css?family=Roboto+Mono"
     />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Oswald"
+    />
+    <link rel="manifest" href="https://johnhenry.github.io/manifest.json" />
+    <link
+      rel="stylesheet"
+      href="https://johnhenry.github.io/lib/vendor/css/reset/2.0.0/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://johnhenry.github.io/lib/css/universal-unstyled-links/0.0.0/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://johnhenry.github.io/lib/css/universal-box-sizing/0.0.0/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://johnhenry.github.io/lib/css/universal-no-margins/0.0.0/index.css"
+    />
+
     <link rel="stylesheet" href="index.css" />
     <script type="module">
       import IDBKeyVal from "./idb-keyval.mjs";
@@ -129,7 +151,7 @@ VAR_1=val1
           </label>
         </span>
         <span>
-          Lighting:
+          Theme:
           <label>
             auto
             <input type="radio" name="settings-theme" value="auto" />
@@ -190,7 +212,7 @@ VAR_1=val1
       </section>
       <section id="hosts" class="view hosts">
         <h2>Hosts</h2>
-        <span>
+        <span id="hosts-controls">
           <button id="add-host">New Host</button>
           <label>
             <input type="checkbox" id="settings-random-hostname" />
@@ -200,7 +222,12 @@ VAR_1=val1
           <button id="settings-reset-cluster">reset</button>
           <button id="settings-reset-cluster-and-close">reset + close</button>
           |
-          <a download="cluster-backup.json" id="settings-download-save">save</a>
+          <a
+            class="button"
+            download="cluster-backup.json"
+            id="settings-download-save"
+            >save</a
+          >
           <button id="settings-upload-save">restore</button>
         </span>
         <input type="file" id="select-file" style="display: none" />

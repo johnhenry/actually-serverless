@@ -1,22 +1,50 @@
 :root {
-  --color-background: white;
-  --color-midground: grey;
-  --color-foreground: black;
-  --space8: 64px;
-  --space4: 32px;
-  --space2: 16px;
+  --COLOR_DARK_BACKGROUND: #212121;
+  --COLOR_DARK_MIDGROUND: #2b2b2b;
+  --COLOR_DARK_FOREGROUND: #f8f8f8;
+  --COLOR_LIGHT_BACKGROUND: #f8f8f8;
+  --COLOR_LIGHT_MIDGROUND: #e0e0e0; /*e0e0e0*/
+  --COLOR_LIGHT_FOREGROUND: #141212;
+
   --space: 8px;
-  --space2: 16px;
-  --space4: 16px;
-  --space_2: 4px;
-  --space_4: 2px;
-  --space_8: 1px;
-  --header-height: calc(var(--space) * 4);
+  --space2: calc(var(--space) * 2);
+  --space4: calc(var(--space) * 4);
+  --space8: calc(var(--space) * 8);
+  --space16: calc(var(--space) * 16);
+  --space_2: calc(var(--space) / 2);
+  --space_4: calc(var(--space) / 4);
+  --space_8: calc(var(--space) / 8);
+  --space_16: calc(var(--space) / 16);
+  --header-height: var(--space8);
+  --gap: var(--space2);
   font-size: 1px;
+  --body-font-size: 24rem;
+  --font-family: "Arial";
+
+  /* Default Color Scheme */
+  --color-background: var(--COLOR_DARK_BACKGROUND);
+  --color-midground: var(--COLOR_DARK_MIDGROUND);
+  --color-foreground: var(--COLOR_DARK_FOREGROUND);
 }
-* {
-  box-sizing: border-box;
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-background: var(--COLOR_LIGHT_BACKGROUND);
+    --color-midground: var(--COLOR_LIGHT_MIDGROUND);
+    --color-foreground: var(--COLOR_LIGHT_FOREGROUND);
+  }
 }
+
+:root .light {
+  --color-background: var(--COLOR_LIGHT_BACKGROUND);
+  --color-midground: var(--COLOR_LIGHT_MIDGROUND);
+  --color-foreground: var(--COLOR_LIGHT_FOREGROUND);
+}
+:root .dark {
+  --color-background: var(--COLOR_DARK_BACKGROUND);
+  --color-midground: var(--COLOR_DARK_MIDGROUND);
+  --color-foreground: var(--COLOR_DARK_FOREGROUND);
+}
+
 /* a[target="_blank"]::after {
   content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
   margin-left: var(--space_2);
@@ -25,19 +53,56 @@
 html,
 body {
   height: 100%;
-  margin: 0;
-  font-size: 14rem;
+  font-size: var(--body-font-size);
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+textarea,
+input,
+label,
+select,
+button,
+a.button {
+  font-size: calc(var(--body-font-size) * 0.8);
+  font-family: var(--font-family);
+}
+
+textarea,
+input {
+  color: var(--color-foreground);
+
+  background-color: var(--color-midground);
+  border: none;
+}
+
+button,
+a.button,
+label {
+  vertical-align: middle;
+  display: inline-block;
+  padding: var(--space2);
+  background-color: var(--color-background);
+  border-radius: var(--space_2);
+  cursor: pointer;
+  font-family: var(--font-family);
+  color: var(--color-foreground);
+}
+button,
+a.button {
+  border: 1px solid var(--color-midground);
 }
 
 header {
   height: var(--header-height);
   display: flex;
   align-items: center;
-  gap: var(--space);
+  gap: var(--gap);
   position: fixed;
   z-index: 1;
   width: 100vw;
-  background-color: lightblue;
+  background-color: var(--color-background);
   padding: var(--space);
 }
 header span {
@@ -50,12 +115,12 @@ header span {
 .pages > section {
   padding-top: var(--header-height);
   flex-direction: column;
-  gap: var(--space);
+  gap: var(--gap);
   height: calc(100vh - var(--space2));
 }
 .pages > section > *:last-child {
   flex: 1 1 auto;
-  gap: var(--space);
+  gap: var(--gap);
 }
 
 .pages > * {
@@ -74,7 +139,12 @@ header span {
 }
 #hosts {
   flex-direction: column;
-  gap: var(--space);
+  gap: var(--gap);
+}
+#hosts-controls {
+  display: flex;
+  gap: var(--gap);
+  align-items: center;
 }
 #add-host {
   flex: 0 0 auto;
@@ -84,7 +154,7 @@ header span {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space);
+  gap: var(--gap);
   height: 50%;
   overflow-y: scroll;
 }
@@ -117,11 +187,10 @@ header span {
 }
 .host main {
   padding: var(--space);
-  font-family: monospace;
   position: relative;
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
   display: flex;
-  gap: var(--space);
+  gap: var(--gap);
   align-items: center;
   min-height: calc(4 * var(--space));
   align-content: stretch;
@@ -164,7 +233,7 @@ header span {
 .circ {
   display: inline-block;
   cursor: pointer;
-  color: var(--color-midground);
+  color: var(--color-foreground);
 }
 .circ::before {
   content: "●";
@@ -205,7 +274,7 @@ header span {
 #requests-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space);
+  gap: var(--gap);
 }
 #requests-headers {
   min-height: calc(8 * var(--space));
