@@ -20,6 +20,10 @@
   font-size: 1px;
   --body-font-size: 24rem;
   --font-family: "Oswald";
+  --color-info: DeepSkyBlue;
+  --color-success: ForestGreen;
+  --color-warning: GoldenRod;
+  --color-warning-severe: Crimson;
 
   /* Default Color Scheme */
   --color-background: var(--COLOR_DARK_BACKGROUND);
@@ -57,6 +61,7 @@ body {
   font-family: var(--font-family);
   background-color: var(--color-background);
   color: var(--color-foreground);
+  overflow-y: hidden;
 }
 
 h1 {
@@ -108,6 +113,7 @@ a.button {
   font-size: calc(var(--body-font-size) * 0.8);
   font-family: var(--font-family);
   text-decoration: none;
+  line-height: normal;
 }
 
 textarea,
@@ -169,6 +175,7 @@ header span {
 .pages > section > *:last-child {
   flex: 1 1 auto;
   gap: var(--gap);
+  overflow-y: scroll;
 }
 
 .pages > * {
@@ -198,14 +205,26 @@ header span {
 #add-host {
   flex: 0 0 auto;
   width: max-content;
+  font-weight: bold;
+  font-size: calc(var(--body-font-size) * 1.1);
 }
+#settings-reload-cluster {
+}
+
+#settings-reset-cluster {
+  color: var(--color-warning);
+}
+
+#settings-reset-cluster-and-close {
+  color: var(--color-warning-severe);
+}
+
 #host-list {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: var(--gap);
   height: 50%;
-  overflow-y: scroll;
 }
 #host-list:empty::before {
   content: 'click "About" to learn more';
@@ -220,20 +239,7 @@ header span {
   display: flex;
   flex-direction: column;
   padding: var(--space);
-  overflow-y: scroll;
   flex: 1 1 auto;
-}
-#log-box .log {
-  color: skyblue;
-}
-#log-box .request {
-  color: grey;
-}
-#log-box .response {
-  color: green;
-}
-#log-box .response.notok {
-  color: orange;
 }
 
 .host {
@@ -272,7 +278,7 @@ header span {
 }
 .host .close::before {
   content: "×";
-  color: red;
+  color: Crimson;
 }
 .unclaimed
   :is(.update-function, .set-file-handler, .load-function-file, .close) {
@@ -328,7 +334,7 @@ header span {
 }
 
 .comparison-table .clear-winner {
-  background-color: LawnGreen;
+  background-color: var(--color-success);
 }
 
 #requests-method {
@@ -348,10 +354,6 @@ header span {
   width: max-content;
 }
 
-#response-box {
-  overflow-y: scroll;
-}
-
 #responses {
   display: flex;
   flex-direction: column;
@@ -364,12 +366,20 @@ header span {
 
 #responses .request {
   border-bottom: 1px dotted black;
-  color: grey;
 }
 #responses .response {
   border-bottom: 1px dashed black;
-  color: green;
 }
-#responses .response.notok {
-  color: orange;
+
+.log {
+  color: skyblue;
+}
+.request {
+  color: grey;
+}
+.response {
+  color: var(--color-success);
+}
+.response.notok {
+  color: var(--color-warning);
 }

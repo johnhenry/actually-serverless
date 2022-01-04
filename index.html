@@ -100,14 +100,13 @@ $FUNCTION_TEXT</textarea
       <a title="settings" href="#settings">Settings</a>
       <a title="about" href="#about">About</a>
       <span
-        >Node <span id="client-index"></span
+        >Node-<span id="client-index"></span
         ><a href="." target="_blank"> +</a></span
       >
     </header>
     <section class="pages">
       <section id="environment" class="view">
-        <h2>Environment</h2>
-        <p class="help-text">Set environment variables.</p>
+        <p class="help-text">Set environment variables for this cluster.</p>
         <textarea
           id="environment-variables"
           placeholder="VAR_0=val0
@@ -116,16 +115,15 @@ VAR_1=val1
         ></textarea>
       </section>
       <section id="requests" class="view">
-        <h2>Requests</h2>
         <p class="help-text">Send requests to hosts in this cluster.</p>
         <div id="requests-form">
           <span>
             <input id="requests-method" placeholder="method" value="GET" />
-            <span>host/</span>
+            <label>host/</label>
             <select id="requests-hosts"></select
-            >/
+            ><label>/</label>
             <input id="requests-path" placeholder="path" value="" />
-            HTTP/1.1
+            <label>HTTP/1.1</label>
           </span>
           <textarea
             id="requests-headers"
@@ -142,8 +140,7 @@ accept: ...
       </section>
 
       <section id="settings" class="view">
-        <h2>Settings</h2>
-        <p class="help-text">Site-wide settings.</p>
+        <p class="help-text">Site settings</p>
         <span>
           Inject Variables :
           <label>
@@ -172,8 +169,7 @@ accept: ...
         </span>
       </section>
       <section id="about" class="view">
-        <h2>About</h2>
-        <p class="help-text">Learn about this service.</p>
+        <p class="help-text">About this service.</p>
         <div>
           <h3>What is this</h3>
           <p>
@@ -182,17 +178,17 @@ accept: ...
           </p>
           <p>
             It works by using a service worker as a load balancer to intercept
-            requests and routes them to tabs.
+            requests and routes them to open tabs.
           </p>
           <p>
             A request matching a given host (at /host/:hostname/...rest of url)
             is sent to a tab where it is handled via <a>worker function</a> or a
-            chosen static folder.
+            static folder.
           </p>
           <p>
-            Workers functions have access to browser APIs including fetch alerts
-            -- just to name a few -- as well as browser extensions. These can
-            all be used to handle requests.
+            Workers functions have access to browser APIs including fetch and
+            alerts -- just to name a few -- as well as browser extensions. These
+            can all be used to handle requests.
           </p>
           <h3>Why is it useful</h3>
           <p>A few use cases:</p>
@@ -229,7 +225,7 @@ accept: ...
             <tr>
               <th>Feature</th>
               <th>Servefolder.dev</th>
-              <th>LocalCluster.dev</th>
+              <th>LocalCluster</th>
             </tr>
             <tr>
               <td>Static Directories</td>
@@ -260,15 +256,13 @@ accept: ...
         </div>
       </section>
       <section id="logs" class="view">
-        <h2>Logs</h2>
-        <p class="help-text">View log of requests sent to this node.</p>
+        <p class="help-text">View requests/response logs on this node.</p>
         <div id="log-box"></div>
       </section>
       <section id="hosts" class="view hosts">
-        <h2>Hosts</h2>
-        <p class="help-text">Claim + manage hosts on this node.</p>
+        <p class="help-text">Manage hosts on this node.</p>
         <span id="hosts-controls">
-          <button id="add-host">Claim Host</button>
+          <button id="add-host">Add Host</button>
           <label>
             <input type="checkbox" id="settings-random-hostname" />
             Random Name

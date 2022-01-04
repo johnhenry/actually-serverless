@@ -37,7 +37,11 @@ const hostsUpdated = (event) => {
         .replaceAll("$HOST_ID", host)
         .replaceAll("$FUNCTION_TEXT", hosts[host].funcText ?? defaultExportStr)
         .trim();
-      setFunction(div.firstChild, hosts);
+      setFunction(
+        div.firstChild,
+        hosts,
+        settings.varglobal && environment.varstring
+      );
     } else {
       div.innerHTML = template.replaceAll("$HOST_ID", host).trim();
       div.firstChild.classList.add("unclaimed");
@@ -69,9 +73,9 @@ const clientsUpdated = async (event) => {
       };
     }
   }
-  await environmentSet(event);
+
   const { index, total } = event.data;
-  document.getElementById("client-index").innerText = `${index} of ${total}`;
+  document.getElementById("client-index").innerText = `${index} [${total}]`;
   hostsUpdated(event);
 };
 const logs = [];
@@ -204,7 +208,7 @@ const handleFetch = async (event) => {
   }
 };
 const environmentElement = document.getElementById("environment-variables");
-
+const settings = {};
 const environment = {};
 
 const environmentSet = async (event) => {
@@ -224,15 +228,17 @@ const environmentSet = async (event) => {
     environmentElement.removeAttribute("title");
   }
   for (const [host, { fs, funcText }] of Object.entries(hosts)) {
+    console.log("S", settings.varglobal && environment.varstring);
     hosts[host].fetch = await createFunctionHandler(
       funcText ?? defaultExportStr,
       settings.varglobal && environment.varstring
     );
   }
 };
-const settings = {};
+
 const settingsSet = async (event) => {
-  const { settings: newSettings } = event.data;
+  await environmentSet(event);
+  const { settings: newSettings = {} } = event.data;
   for (const [key, value] of Object.entries(newSettings)) {
     settings[key] = value;
   }
@@ -310,6 +316,7 @@ document.body.addEventListener("click", (event) => {
           host.querySelector(".update-function").value = await files[
             files.length - 1
           ].text();
+          console.log(2, { settings });
           setFunction(host, hosts, settings.varglobal && environment.varstring);
         };
         fileSelector.addEventListener("change", onFileSelected);
@@ -325,7 +332,7 @@ document.body.addEventListener("input", (event) => {
     const host = target.closest(".host");
     if (host) {
       if (target.classList.contains("update-function")) {
-        setFunction(host, hosts);
+        setFunction(host, hosts, settings.varglobal && environment.varstring);
       }
     }
   }
@@ -466,7 +473,9 @@ document
 document
   .getElementById("settings-reload-cluster")
   .addEventListener("click", () => {
-    if (confirm("Reload cluster? Data may be lost.")) {
+    if (
+      confirm("Reload cluster? Data may be lost or shuffeled between nodes.")
+    ) {
       Utils.PostToSW({
         type: "reload-cluster",
       });
