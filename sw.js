@@ -409,6 +409,7 @@ const HostFetch = async (host, url, request) => {
         }
       };
     });
+
     // Post to the client to ask it to provide this file.
     const psuedoRequest = {
       url,
@@ -526,9 +527,12 @@ self.addEventListener("fetch", async (event) => {
       const beginner = `host/${hostName}/`;
       if (scopeRelativeUrl.startsWith(beginner)) {
         const hostRelativeUrl = scopeRelativeUrl.substr(beginner.length);
+        // BAD: {hostName: 'penitent-prism', hostRelativeUrl: '', swScope: 'http://localhost:8080/localcluster/'}
+        // GOOD: {hostName: 'penitent-tangent', hostRelativeUrl: '', swScope: 'http://localhost:62424/'}
         return HostFetch(hostName, hostRelativeUrl, event.request);
       }
     }
   };
+
   event.respondWith(getHost());
 });
