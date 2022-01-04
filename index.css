@@ -3,7 +3,7 @@
   --COLOR_DARK_MIDGROUND: #2b2b2b;
   --COLOR_DARK_FOREGROUND: #f8f8f8;
   --COLOR_LIGHT_BACKGROUND: #f8f8f8;
-  --COLOR_LIGHT_MIDGROUND: #e0e0e0; /*e0e0e0*/
+  --COLOR_LIGHT_MIDGROUND: #e0e0e0;
   --COLOR_LIGHT_FOREGROUND: #141212;
 
   --space: 8px;
@@ -19,7 +19,7 @@
   --gap: var(--space2);
   font-size: 1px;
   --body-font-size: 24rem;
-  --font-family: "Arial";
+  --font-family: "Oswald";
 
   /* Default Color Scheme */
   --color-background: var(--COLOR_DARK_BACKGROUND);
@@ -59,6 +59,46 @@ body {
   color: var(--color-foreground);
 }
 
+h1 {
+  font-size: calc(var(--body-font-size) * 1.8);
+  font-weight: bold;
+}
+h2 {
+  font-size: calc(var(--body-font-size) * 1.6);
+  font-weight: bold;
+}
+h3 {
+  font-size: calc(var(--body-font-size) * 1.4);
+  font-weight: bold;
+}
+h4 {
+  font-size: calc(var(--body-font-size) * 1.2);
+  font-weight: bold;
+}
+h5 {
+  font-size: calc(var(--body-font-size) * 1);
+  font-weight: bold;
+}
+h6 {
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  padding-top: var(--space2);
+  padding-bottom: var(--space2);
+}
+p {
+  padding: var(--space2);
+  line-height: 100%;
+}
+p.help-text {
+  padding: none;
+  font-size: calc(var(--body-font-size) * 0.8);
+}
+
 textarea,
 input,
 label,
@@ -67,14 +107,19 @@ button,
 a.button {
   font-size: calc(var(--body-font-size) * 0.8);
   font-family: var(--font-family);
+  text-decoration: none;
 }
 
 textarea,
-input {
+input,
+select {
   color: var(--color-foreground);
-
   background-color: var(--color-midground);
   border: none;
+  padding: var(--space2);
+}
+textarea {
+  padding: var(--space2);
 }
 
 button,
@@ -92,6 +137,8 @@ label {
 button,
 a.button {
   border: 1px solid var(--color-midground);
+  box-shadow: 0 1px 3px 0 rgb(0, 0, 0, 0.2);
+  border-radius: 5px;
 }
 
 header {
@@ -105,12 +152,13 @@ header {
   background-color: var(--color-background);
   padding: var(--space);
 }
+
 header span {
   margin-left: auto;
 }
 
 .pages {
-  padding: var(--space);
+  padding: var(--space) var(--space8);
 }
 .pages > section {
   padding-top: var(--header-height);
@@ -141,6 +189,7 @@ header span {
   flex-direction: column;
   gap: var(--gap);
 }
+
 #hosts-controls {
   display: flex;
   gap: var(--gap);
@@ -157,6 +206,11 @@ header span {
   gap: var(--gap);
   height: 50%;
   overflow-y: scroll;
+}
+#host-list:empty::before {
+  content: 'click "About" to learn more';
+  opacity: 0.75;
+  font-size: calc(var(--body-font-size) * 0.8);
 }
 #host-list > * {
   margin: var(--space_8);
@@ -183,7 +237,8 @@ header span {
 }
 
 .host {
-  box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 3px 0 rgb(0, 0, 0, 0.2);
+  border-radius: 5px;
 }
 .host main {
   padding: var(--space);
@@ -203,11 +258,12 @@ header span {
 .host textarea {
   border-top: none;
   border: none;
-  padding: var(--space);
+  padding: var(--space2);
   resize: vertical;
   width: 100%;
-  border-radius: none;
-  min-height: calc(16 * var(--space));
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  min-height: calc(24 * var(--space));
 }
 
 .host .close {
@@ -259,6 +315,12 @@ header span {
   border-collapse: collapse;
   min-height: 128rem;
   vertical-align: middle;
+}
+.comparison-table tr {
+  height: var(--space8);
+}
+.comparison-table {
+  width: 100%;
 }
 
 .comparison-table tr:first-child {

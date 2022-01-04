@@ -71,7 +71,7 @@ const clientsUpdated = async (event) => {
   }
   await environmentSet(event);
   const { index, total } = event.data;
-  document.getElementById("client-index").innerText = `${index}/${total}`;
+  document.getElementById("client-index").innerText = `${index} of ${total}`;
   hostsUpdated(event);
 };
 const logs = [];
@@ -153,7 +153,11 @@ const handleFetch = async (event) => {
       env: (settings.varcontext && environment.vars) || {},
       log: consoleLog(event.data.host),
     });
-    response.headers.append("x-resid", request.headers.get("x-reqid"));
+    try {
+      //TODO: This may fail if the response is proxied through fetch, i think?
+      response.headers.append("x-resid", request.headers.get("x-reqid"));
+    } catch {}
+
     const { body: resBody, headers: resHeaders, status, statusText } = response;
     // Log Response
     {
@@ -387,6 +391,7 @@ document.getElementById("requests-send").addEventListener("click", () => {
   requestDiv.appendChild(requestHeadersDiv);
   requestDiv.appendChild(requestBodyDiv);
   responseElement.appendChild(requestDiv);
+  responseElement.scrollTop = responseElement.scrollHeight;
   globalThis.fetch(request).then(async (response) => {
     const responseDiv = document.createElement("div");
     responseDiv.classList.add("response");
@@ -421,6 +426,7 @@ document.getElementById("requests-send").addEventListener("click", () => {
     responseDiv.appendChild(responseHeadersDiv);
     responseDiv.appendChild(responsePreview);
     requestDiv.insertAdjacentHTML("afterend", responseDiv.outerHTML);
+    responseElement.scrollTop = responseElement.scrollHeight;
   });
 });
 

@@ -91,20 +91,33 @@ $FUNCTION_TEXT</textarea
   </head>
   <body>
     <header>
+      <a class="title" title="hosts" href="#"><h1>Local Custer</h1></a>
       <a title="hosts" href="#">Hosts</a>
-      <a title="requests" href="#requests">Requests</a>
       <a title="environment" href="#environment">Environment</a>
+      <a title="requests" href="#requests">Requests</a>
+
       <a title="logs" href="#logs">Logs</a>
       <a title="settings" href="#settings">Settings</a>
       <a title="about" href="#about">About</a>
       <span
-        >Client: <span id="client-index"></span
+        >Node <span id="client-index"></span
         ><a href="." target="_blank"> +</a></span
       >
     </header>
     <section class="pages">
+      <section id="environment" class="view">
+        <h2>Environment</h2>
+        <p class="help-text">Set environment variables.</p>
+        <textarea
+          id="environment-variables"
+          placeholder="VAR_0=val0
+VAR_1=val1
+..."
+        ></textarea>
+      </section>
       <section id="requests" class="view">
         <h2>Requests</h2>
+        <p class="help-text">Send requests to hosts in this cluster.</p>
         <div id="requests-form">
           <span>
             <input id="requests-method" placeholder="method" value="GET" />
@@ -128,17 +141,9 @@ accept: ...
         </div>
       </section>
 
-      <section id="environment" class="view">
-        <h2>Environment</h2>
-        <textarea
-          id="environment-variables"
-          placeholder="VAR_0=val0
-VAR_1=val1
-..."
-        ></textarea>
-      </section>
       <section id="settings" class="view">
         <h2>Settings</h2>
+        <p class="help-text">Site-wide settings.</p>
         <span>
           Inject Variables :
           <label>
@@ -168,13 +173,46 @@ VAR_1=val1
       </section>
       <section id="about" class="view">
         <h2>About</h2>
+        <p class="help-text">Learn about this service.</p>
         <div>
           <h3>What is this</h3>
-          <p></p>
+          <p>
+            This site allows you to run a cluster of servers locally, within
+            your browser.
+          </p>
+          <p>
+            It works by using a service worker as a load balancer to intercept
+            requests and routes them to tabs.
+          </p>
+          <p>
+            A request matching a given host (at /host/:hostname/...rest of url)
+            is sent to a tab where it is handled via <a>worker function</a> or a
+            chosen static folder.
+          </p>
+          <p>
+            Workers functions have access to browser APIs including fetch alerts
+            -- just to name a few -- as well as browser extensions. These can
+            all be used to handle requests.
+          </p>
           <h3>Why is it useful</h3>
-          <p></p>
-          <h3>How does it work</h3>
-          <p></p>
+          <p>A few use cases:</p>
+          <h4>Secure origin</h4>
+          <p>
+            Today, it is nearly impossible to do web development without a
+            server. Many browser APIs fail when a site is opened via the local
+            file system.
+          </p>
+          <p>
+            This services allows you to server any number of local folders
+            without installing a server. Additoinally, since this service is
+            served on a secure origin, you avoid that whole problem as well.
+          </p>
+          <h4>Testing Cloud Functions</h4>
+          <p>
+            This service allows one to easily fire up and test cloud functions.
+            It aims to be largely compatible with offerings like Deno Deploy and
+            Cloudflare Workers.
+          </p>
           <h3>Comparison to Serevefolder.dev</h3>
           <p>
             This is a fork of
@@ -194,24 +232,43 @@ VAR_1=val1
               <th>LocalCluster.dev</th>
             </tr>
             <tr>
+              <td>Static Directories</td>
+              <td colspan="2" class="clear-winner">✓</td>
+            </tr>
+            <tr>
               <td>Cloud Functions</td>
               <td>𐄂</td>
               <td class="clear-winner">✓</td>
             </tr>
+
             <tr>
               <td>Browser Compatibility</td>
-              <td>Chrome, Firefox, Safari</td>
-              <td>Chrome</td>
+              <td class="clear-winner">All Major Browsers</td>
+              <td>Chrome + Edge</td>
+            </tr>
+            <tr>
+              <td>Host/Tab Topology</td>
+              <td>One-to-One</td>
+              <td class="clear-winner">Many-To-Many</td>
+            </tr>
+            <tr>
+              <td>Backup</td>
+              <td>Some settings saved.</td>
+              <td class="clear-winner">Most settings saved. Export/import.</td>
             </tr>
           </table>
         </div>
       </section>
       <section id="logs" class="view">
         <h2>Logs</h2>
+        <p class="help-text">View log of requests sent to this node.</p>
         <div id="log-box"></div>
       </section>
       <section id="hosts" class="view hosts">
         <h2>Hosts</h2>
+        <p class="help-text">
+          Create / manage hosts on this node to handle requests.
+        </p>
         <span id="hosts-controls">
           <button id="add-host">New Host</button>
           <label>
