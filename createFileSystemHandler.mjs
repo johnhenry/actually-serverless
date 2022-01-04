@@ -4,11 +4,6 @@ import generateDirectoryListing from "./generateDirectoryListing.mjs";
 export default async () => {
   const folderHandle = await window.showDirectoryPicker();
   const fetch = async ({ url }) => {
-    const { scope } = await navigator.serviceWorker.getRegistration();
-    if (url.startsWith(scope)) {
-      const { pathname } = new URL(scope);
-      url = url.replace(pathname, "/");
-    }
     try {
       let relativeUrl = decodeURIComponent(new URL(url).pathname);
       // Strip leading / if any, so the last token is the folder/file name

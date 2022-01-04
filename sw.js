@@ -409,7 +409,10 @@ const HostFetch = async (host, url, request) => {
         }
       };
     });
-
+    // TODO: May always be true?
+    if (!url.startsWith("/")) {
+      url = "/" + url;
+    }
     // Post to the client to ask it to provide this file.
     const psuedoRequest = {
       url,
