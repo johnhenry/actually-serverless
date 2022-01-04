@@ -447,7 +447,7 @@ const updateSettings = (event) => {
   ).checked;
   settings.theme = document.querySelector(
     'input[name="settings-theme"]:checked'
-  ).value;
+  )?.value;
   settings.randomHostName = document.getElementById(
     "settings-random-hostname"
   ).checked;
