@@ -43,8 +43,8 @@ export async function WaitForSWReady() {
   }
 }
 
-export function PostToSW(...o) {
-  navigator.serviceWorker.controller.postMessage(...o);
+export function PostToSW(o) {
+  navigator.serviceWorker.controller.postMessage(o);
 }
 
 const idbkvStore = IDBKeyVal.createStore("host-page", "host-store");
@@ -124,16 +124,3 @@ export class FakeDirectory {
     yield* this._files.entries();
   }
 }
-
-// export async function NotifySW(...o) {
-//   const permission = await Notification.requestPermission();
-//   if (permission === "granted") {
-//     const registration = await navigator.serviceWorker.getRegistration();
-//     registration.showNotification("Vibration Sample", {
-//       body: "Buzz! Buzz!",
-//       icon: "data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII=",
-//       vibrate: [200, 100, 200, 100, 200, 100, 200],
-//       tag: "vibration-sample",
-//     });
-//   }
-// }

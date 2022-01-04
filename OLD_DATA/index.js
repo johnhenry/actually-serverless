@@ -185,7 +185,7 @@ console.log("SW ready");
 // When closing this client tell the SW to stop hosting for it
 window.addEventListener("unload", () => {
   Utils.PostToSW({
-    type: "host-stop",
+    type: "remove-client",
     hostName,
   });
 });

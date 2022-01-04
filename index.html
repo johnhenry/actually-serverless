@@ -1,113 +1,295 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+  <template id="template-host">
+    <div id="$HOST_ID" class="host">
+      <main>
+        <span
+          class="set-strategy circ first"
+          title="select strategy: first"
+          data-strategy="first"
+        >
+        </span>
+        <span
+          class="set-strategy circ last-used"
+          title="select strategy: last-used"
+          data-strategy="last-used"
+        >
+        </span>
+        <span
+          class="set-strategy circ round-robin"
+          title="select strategy: round-robin"
+          data-strategy="round-robin"
+        >
+        </span>
+        <span
+          class="set-strategy circ random"
+          title="select strategy: random"
+          data-strategy="random"
+        >
+        </span>
+        <a
+          href="./host/$HOST_ID/"
+          target="_blank"
+          rel="opener"
+          title="host/$HOST_ID"
+          >$HOST_ID/</a
+        >
+
+        <button onclick="" class="load-function-file">𝑓</button>
+
+        <button class="set-file-handler">📁</button>
+        <button class="claim-host">+</button>
+        <span class="release-host close"></span>
+      </main>
+      <textarea
+        class="update-function"
+        placeholder="Click 📁 to serve a folder or add some code here to modify a request.
+Double-lick to load file."
+      >
+$FUNCTION_TEXT</textarea
+      >
+    </div>
+  </template>
   <head>
-    <meta charset="utf8" />
-    <title>Serve folder for web development</title>
+    <meta name="charset" value="utf8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Local Cluster for web development</title>
+    <!--TODO: Update icon-->
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto+Mono"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Oswald"
+    />
+    <link rel="manifest" href="https://johnhenry.github.io/manifest.json" />
+    <link
+      rel="stylesheet"
+      href="https://johnhenry.github.io/lib/vendor/css/reset/2.0.0/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://johnhenry.github.io/lib/css/universal-unstyled-links/0.0.0/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://johnhenry.github.io/lib/css/universal-box-sizing/0.0.0/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://johnhenry.github.io/lib/css/universal-no-margins/0.0.0/index.css"
+    />
+
     <link rel="stylesheet" href="index.css" />
+    <script type="module">
+      import IDBKeyVal from "./idb-keyval.mjs";
+      window.IDBKeyVal = IDBKeyVal;
+    </script>
+    <script src="index.mjs" type="module"></script>
   </head>
   <body>
-    <form action="http://localhost:8080/servefolder/host/host/" method="post">
-      <input type="text" name="file" />
-      <input type="submit" value="Upload" />
-    </form>
-    <div id="mainwrap">
-      <h1 id="maintitle">Serve folder</h1>
-      <p>
-        Serve a local folder of files in your browser for easy testing without
-        having to run a server.
-      </p>
+    <header>
+      <a class="title" title="hosts" href="#"><h1>Local Custer</h1></a>
+      <a title="hosts" href="#">Hosts</a>
+      <a title="environment" href="#environment">Environment</a>
+      <a title="requests" href="#requests">Requests</a>
 
-      <noscript
-        ><strong
-          >This page requires JavaScript to work, but it looks like JavaScript
-          is disabled. Please enable JavaScript and try again.</strong
-        ></noscript
+      <a title="logs" href="#logs">Logs</a>
+      <a title="settings" href="#settings">Settings</a>
+      <a title="about" href="#about">About</a>
+      <span
+        >Node <span id="client-index"></span
+        ><a href="." target="_blank"> +</a></span
       >
+    </header>
+    <section class="pages">
+      <section id="environment" class="view">
+        <h2>Environment</h2>
+        <p class="help-text">Set environment variables.</p>
+        <textarea
+          id="environment-variables"
+          placeholder="VAR_0=val0
+VAR_1=val1
+..."
+        ></textarea>
+      </section>
+      <section id="requests" class="view">
+        <h2>Requests</h2>
+        <p class="help-text">Send requests to hosts in this cluster.</p>
+        <div id="requests-form">
+          <span>
+            <input id="requests-method" placeholder="method" value="GET" />
+            <span>host/</span>
+            <select id="requests-hosts"></select
+            >/
+            <input id="requests-path" placeholder="path" value="" />
+            HTTP/1.1
+          </span>
+          <textarea
+            id="requests-headers"
+            placeholder="content-type: text/plain
+accept: ...
+..."
+          ></textarea>
+          <textarea id="requests-body"></textarea>
+          <button id="requests-send">Send</button>
+        </div>
+        <div id="response-box">
+          <div id="responses"></div>
+        </div>
+      </section>
 
-      <br />
-      <button id="uselastfolder" hidden>Use last folder</button>
-      <input type="file" webkitdirectory id="inputfolder" hidden />
-      <br />
-      <table id="hostinfo">
-        <tr>
-          <th>Folder</th>
-          <th>Host</th>
-        </tr>
-      </table>
-      <br />
-      <span>
-        Host Path:
-        <input type="text" placeholder="host{:}" id="hostNamePattern" />
-        <button id="pickfolder" hidden>Pick folder</button>
-        <button id="createfunction">Create Function</button>
-      </span>
+      <section id="settings" class="view">
+        <h2>Settings</h2>
+        <p class="help-text">Site-wide settings.</p>
+        <span>
+          Inject Variables :
+          <label>
+            context
+            <input type="checkbox" id="settings-variables-inject-context" />
+          </label>
+          <label>
+            global
+            <input type="checkbox" id="settings-variables-inject-global" />
+          </label>
+        </span>
+        <span>
+          Theme:
+          <label>
+            auto
+            <input type="radio" name="settings-theme" value="auto" />
+          </label>
+          <label>
+            dark
+            <input type="radio" name="settings-theme" value="dark" />
+          </label>
+          <label>
+            light
+            <input type="radio" name="settings-theme" value="light" />
+          </label>
+        </span>
+      </section>
+      <section id="about" class="view">
+        <h2>About</h2>
+        <p class="help-text">Learn about this service.</p>
+        <div>
+          <h3>What is this</h3>
+          <p>
+            This site allows you to run a cluster of servers locally, within
+            your browser.
+          </p>
+          <p>
+            It works by using a service worker as a load balancer to intercept
+            requests and routes them to tabs.
+          </p>
+          <p>
+            A request matching a given host (at /host/:hostname/...rest of url)
+            is sent to a tab where it is handled via <a>worker function</a> or a
+            chosen static folder.
+          </p>
+          <p>
+            Workers functions have access to browser APIs including fetch alerts
+            -- just to name a few -- as well as browser extensions. These can
+            all be used to handle requests.
+          </p>
+          <h3>Why is it useful</h3>
+          <p>A few use cases:</p>
+          <h4>Secure origin</h4>
+          <p>
+            Today, it is nearly impossible to do web development without a
+            server. Many browser APIs fail when a site is opened via the local
+            file system.
+          </p>
+          <p>
+            This services allows you to server any number of local folders
+            without installing a server. Additoinally, since this service is
+            served on a secure origin, you avoid that whole problem as well.
+          </p>
+          <h4>Testing Cloud Functions</h4>
+          <p>
+            This service allows one to easily fire up and test cloud functions.
+            It aims to be largely compatible with offerings like Deno Deploy and
+            Cloudflare Workers.
+          </p>
+          <h3>Comparison to Serevefolder.dev</h3>
+          <p>
+            This is a fork of
+            <a
+              href="https://github.com/AshleyScirra/servefolder.dev"
+              target="_blank"
+              >servefolder.dev</a
+            >
 
-      <details>
-        <summary>More information</summary>
-        <h3>What is this?</h3>
-        <p>
-          This page lets you host a local folder with web development files,
-          such as HTML, JavaScript and CSS, directly in your browser. It works
-          using Service Workers: everything is served from your local system
-          only, nothing is uploaded to a server, and your files are not shared
-          with anybody else.
+            <a href="https://servefolder.dev/" target="_blank">(hosted here)</a
+            >, so comparisons are welcome.
+          </p>
+          <table class="comparison-table">
+            <tr>
+              <th>Feature</th>
+              <th>Servefolder.dev</th>
+              <th>LocalCluster.dev</th>
+            </tr>
+            <tr>
+              <td>Static Directories</td>
+              <td colspan="2" class="clear-winner">✓</td>
+            </tr>
+            <tr>
+              <td>Cloud Functions</td>
+              <td>𐄂</td>
+              <td class="clear-winner">✓</td>
+            </tr>
+
+            <tr>
+              <td>Browser Compatibility</td>
+              <td class="clear-winner">All Major Browsers</td>
+              <td>Chrome + Edge</td>
+            </tr>
+            <tr>
+              <td>Host/Tab Topology</td>
+              <td>One-to-One</td>
+              <td class="clear-winner">Many-To-Many</td>
+            </tr>
+            <tr>
+              <td>Backup</td>
+              <td>Some settings saved.</td>
+              <td class="clear-winner">Most settings saved. Export/import.</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+      <section id="logs" class="view">
+        <h2>Logs</h2>
+        <p class="help-text">View log of requests sent to this node.</p>
+        <div id="log-box"></div>
+      </section>
+      <section id="hosts" class="view hosts">
+        <h2>Hosts</h2>
+        <p class="help-text">
+          Create / manage hosts on this node to handle requests.
         </p>
-
-        <h3>Why is it useful?</h3>
-        <p>
-          In some enviroments running a HTTP server may be difficult or
-          inconvenient, for example if you're on a system with limited
-          permissions. Alternatively it's another quick way to quickly test some
-          web development files.
-        </p>
-
-        <h3>How does it work?</h3>
-        <p>
-          Click the big button at the top and choose a folder. Once chosen and
-          any permission prompt approved, a link will appear. Click the link and
-          it will open a new tab and load index.html if a file with that name
-          exists, otherwise it will show the contents of the folder for
-          browsing. This is particularly useful with HTML files, which are also
-          able to load all sub-resources like they can on a normal web server,
-          but this does not actually involve a HTTP server (it works using
-          Service Workers). Note the provided link will only work so long as
-          this page remains open &mdash; as soon as you close the page the link
-          will stop working.
-        </p>
-
-        <p>
-          You can also open this tab multiple times and host different folders
-          simultaneously. Additional tabs will host at a different URL for
-          accessing different folders.
-        </p>
-
-        <h3>Is my data kept private?</h3>
-        <p>
-          Yes. Your chosen files will not leave your computer. The files will
-          not be accessible by anyone else, the provided link only works for
-          you, and nothing is transmitted over a network while loading it.
-        </p>
-
-        <h3>Who made this?</h3>
-        <p>
-          Hi, I'm <a href="https://twitter.com/ashleygullen">@AshleyGullen</a>,
-          founder of Scirra and lead developer on
-          <a href="https://www.construct.net/">Construct</a>.
-        </p>
-
-        <p>
-          <em
-            >v1.1 &mdash; last updated December 8th 2021 &mdash;
-            <a href="https://github.com/AshleyScirra/servefolder.dev"
-              >View code on GitHub</a
-            ></em
+        <span id="hosts-controls">
+          <button id="add-host">New Host</button>
+          <label>
+            <input type="checkbox" id="settings-random-hostname" />
+            Random Name
+          </label>
+          <button id="settings-reload-cluster">reload</button>
+          <button id="settings-reset-cluster">reset</button>
+          <button id="settings-reset-cluster-and-close">reset + close</button>
+          |
+          <a
+            class="button"
+            download="cluster-backup.json"
+            id="settings-download-save"
+            >save</a
           >
-        </p>
-      </details>
-
-      <script src="idb-keyval.js" defer></script>
-      <script src="index.js" type="module"></script>
-    </div>
+          <button id="settings-upload-save">restore</button>
+        </span>
+        <input type="file" id="select-file" style="display: none" />
+        <div id="host-list"></div>
+      </section>
+    </section>
   </body>
 </html>
