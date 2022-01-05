@@ -441,29 +441,28 @@ document.getElementById("requests-send").addEventListener("click", async () => {
     let responsePreview;
     const contentType = response.headers.get("content-type");
 
-    switch (contentType) {
-      case "text/html":
-      case "application/html":
-        responsePreview = document.createElement("iframe");
-        responsePreview.srcdoc = await blob.text();
-        break;
-      default:
-        if (contentType.startsWith("text/")) {
-          responsePreview = document.createElement("div");
-          responsePreview.innerText = await blob.text();
-        } else if (contentType.startsWith("image/")) {
-          responsePreview = document.createElement("img");
-          responsePreview.src = dataURL;
-        } else if (contentType.startsWith("audio/")) {
-          responsePreview = document.createElement("audio");
-          responsePreview.src = dataURL;
-        } else if (contentType.startsWith("video/")) {
-          responsePreview = document.createElement("video");
-          responsePreview.src = dataURL;
-        } else {
-          responsePreview = document.createElement("div");
-          responsePreview.innerText = "no preview available";
-        }
+    if (
+      contentType.startsWith("text/html") ||
+      contentType.startsWith("application/html")
+    ) {
+      responsePreview = document.createElement("iframe");
+      responsePreview.srcdoc = await blob.text();
+    }
+    if (contentType.startsWith("text/")) {
+      responsePreview = document.createElement("div");
+      responsePreview.innerText = await blob.text();
+    } else if (contentType.startsWith("image/")) {
+      responsePreview = document.createElement("img");
+      responsePreview.src = dataURL;
+    } else if (contentType.startsWith("audio/")) {
+      responsePreview = document.createElement("audio");
+      responsePreview.src = dataURL;
+    } else if (contentType.startsWith("video/")) {
+      responsePreview = document.createElement("video");
+      responsePreview.src = dataURL;
+    } else {
+      responsePreview = document.createElement("div");
+      responsePreview.innerText = "no preview available";
     }
 
     responsePreview.classList.add("preview");
