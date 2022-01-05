@@ -487,6 +487,9 @@ document.getElementById("requests-abort").addEventListener("click", () => {
     abortController = undefined;
   }
 });
+document.getElementById("requests-clear").addEventListener("click", () => {
+  responseElement.innerHTML = "";
+});
 
 environmentElement.addEventListener("input", () => {
   Utils.PostToSW({
