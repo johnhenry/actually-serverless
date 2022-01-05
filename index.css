@@ -375,10 +375,10 @@ header span {
 #responses .response .headers .key::after {
   content: ":";
 }
-#response .response .headers a {
+#responses .response .headers a {
   cursor: pointer;
 }
-#response .preview {
+#responses .preview {
   width: 100%;
 }
 
