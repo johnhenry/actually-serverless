@@ -473,7 +473,7 @@ document
   .getElementById("settings-reload-cluster")
   .addEventListener("click", () => {
     if (
-      confirm("Reload cluster? Data may be lost or shuffeled between nodes.")
+      confirm("Reload cluster? Data may be lost or shuffeled between windows.")
     ) {
       Utils.PostToSW({
         type: "reload-cluster",

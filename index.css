@@ -337,8 +337,6 @@ header span {
   background-color: var(--color-success);
 }
 
-#requests-method {
-}
 #requests-form {
   display: flex;
   flex-direction: column;
