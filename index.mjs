@@ -447,8 +447,7 @@ document.getElementById("requests-send").addEventListener("click", async () => {
     ) {
       responsePreview = document.createElement("iframe");
       responsePreview.srcdoc = await blob.text();
-    }
-    if (contentType.startsWith("text/")) {
+    } else if (contentType.startsWith("text/")) {
       responsePreview = document.createElement("div");
       responsePreview.innerText = await blob.text();
     } else if (contentType.startsWith("image/")) {
