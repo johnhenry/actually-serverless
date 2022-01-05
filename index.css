@@ -378,6 +378,9 @@ header span {
 #response .response .headers a {
   cursor: pointer;
 }
+#response .preview {
+  width: 100%;
+}
 
 .log {
   color: skyblue;
