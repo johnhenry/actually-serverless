@@ -3,30 +3,33 @@
   <template id="template-host">
     <div id="$HOST_ID" class="host">
       <main>
-        <span
-          class="set-strategy circ first"
-          title="select strategy: first"
-          data-strategy="first"
-        >
+        <span class="strategies">
+          <span
+            class="set-strategy toggler first"
+            title="select strategy: first"
+            data-strategy="first"
+            >●
+          </span>
+          <span
+            class="set-strategy toggler last-used"
+            title="select strategy: last-used"
+            data-strategy="last-used"
+            >●
+          </span>
+          <span
+            class="set-strategy toggler round-robin"
+            title="select strategy: round-robin"
+            data-strategy="round-robin"
+            >●
+          </span>
+          <span
+            class="set-strategy toggler random"
+            title="select strategy: random"
+            data-strategy="random"
+            >●
+          </span>
         </span>
-        <span
-          class="set-strategy circ last-used"
-          title="select strategy: last-used"
-          data-strategy="last-used"
-        >
-        </span>
-        <span
-          class="set-strategy circ round-robin"
-          title="select strategy: round-robin"
-          data-strategy="round-robin"
-        >
-        </span>
-        <span
-          class="set-strategy circ random"
-          title="select strategy: random"
-          data-strategy="random"
-        >
-        </span>
+
         <a
           href="./host/$HOST_ID/"
           target="_blank"

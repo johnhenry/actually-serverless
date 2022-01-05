@@ -292,25 +292,22 @@ header span {
   margin-left: auto;
 }
 
-.circ {
+.toggler {
   display: inline-block;
   cursor: pointer;
   color: var(--color-foreground);
+  padding: 0px;
 }
-.circ::before {
-  content: "●";
-}
-
-.circ.first.selected {
+.toggler.first.selected {
   color: Crimson;
 }
-.circ.last-used.selected {
+.toggler.last-used.selected {
   color: GoldenRod;
 }
-.circ.round-robin.selected {
+.toggler.round-robin.selected {
   color: ForestGreen;
 }
-.circ.random.selected {
+.toggler.random.selected {
   color: DeepSkyBlue;
 }
 
