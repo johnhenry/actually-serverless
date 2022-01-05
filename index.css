@@ -115,6 +115,9 @@ a.button {
   text-decoration: none;
   line-height: normal;
 }
+button[disabled] {
+  color: grey;
+}
 
 textarea,
 input,
@@ -348,6 +351,9 @@ header span {
 #requests-send {
   width: max-content;
 }
+#requests-abort {
+  width: max-content;
+}
 
 #responses {
   display: flex;
@@ -364,6 +370,13 @@ header span {
 }
 #responses .response {
   border-bottom: 1px dashed black;
+}
+
+#responses .response .headers .key::after {
+  content: ":";
+}
+#response .response .headers a {
+  cursor: pointer;
 }
 
 .log {

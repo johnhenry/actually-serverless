@@ -346,9 +346,9 @@ document.getElementById("add-host").addEventListener("click", () => {
     });
   }
 });
-
+let abortController;
 const responseElement = document.getElementById("responses");
-document.getElementById("requests-send").addEventListener("click", () => {
+document.getElementById("requests-send").addEventListener("click", async () => {
   const method = document.getElementById("requests-method").value.toLowerCase();
   const host = document.getElementById("requests-hosts").value;
   const path = document.getElementById("requests-path").value;
@@ -398,7 +398,12 @@ document.getElementById("requests-send").addEventListener("click", () => {
   requestDiv.appendChild(requestBodyDiv);
   responseElement.appendChild(requestDiv);
   responseElement.scrollTop = responseElement.scrollHeight;
-  globalThis.fetch(request).then(async (response) => {
+  abortController = new AbortController();
+  try {
+    document.getElementById("requests-abort").removeAttribute("disabled");
+    const response = await globalThis.fetch(request, {
+      signal: abortController.signal,
+    });
     const responseDiv = document.createElement("div");
     responseDiv.classList.add("response");
     if (!response.ok) {
@@ -409,22 +414,58 @@ document.getElementById("requests-send").addEventListener("click", () => {
     responsePreambleDiv.classList.add("preamble");
     const responseHeadersDiv = document.createElement("div");
     responseHeadersDiv.classList.add("headers");
-    responseHeadersDiv.innerText = `
-    ${[...response.headers.entries()]
-      .map(([key, value]) => `${key}: ${value}`)
-      .join("\n")}
-    `;
+    const blob = await response.blob();
+    let dataURL;
+    for (const [key, value] of response.headers.entries()) {
+      const header = document.createElement("div");
+      const headerKey = document.createElement("span");
+      headerKey.innerText = key;
+      headerKey.classList.add("key");
+      let headerValue;
+      if (key === "content-type") {
+        headerValue = document.createElement("a");
+        headerValue.setAttribute("download", "");
+        dataURL = URL.createObjectURL(blob);
+        headerValue.href = dataURL;
+        headerValue.download = "response.bin";
+      } else {
+        headerValue = document.createElement("span");
+      }
+      headerValue.innerText = value;
+      headerValue.classList.add("value");
+      header.appendChild(headerKey);
+      header.appendChild(headerValue);
+      responseHeadersDiv.appendChild(header);
+    }
+
     let responsePreview;
     const contentType = response.headers.get("content-type");
+
     switch (contentType) {
       case "text/html":
+      case "application/html":
         responsePreview = document.createElement("iframe");
-        responsePreview.srcdoc = await response.text();
+        responsePreview.srcdoc = await blob.text();
         break;
       default:
-        responsePreview = document.createElement("div");
-        responsePreview.innerText = await response.text();
+        if (contentType.startsWith("text/")) {
+          responsePreview = document.createElement("div");
+          responsePreview.innerText = await blob.text();
+        } else if (contentType.startsWith("image/")) {
+          responsePreview = document.createElement("img");
+          responsePreview.src = dataURL;
+        } else if (contentType.startsWith("audio/")) {
+          responsePreview = document.createElement("audio");
+          responsePreview.src = dataURL;
+        } else if (contentType.startsWith("video/")) {
+          responsePreview = document.createElement("video");
+          responsePreview.src = dataURL;
+        } else {
+          responsePreview = document.createElement("div");
+          responsePreview.innerText = "no preview available";
+        }
     }
+
     responsePreview.classList.add("preview");
     responsePreview.classList.add(encodeURI(contentType));
 
@@ -433,7 +474,18 @@ document.getElementById("requests-send").addEventListener("click", () => {
     responseDiv.appendChild(responsePreview);
     requestDiv.insertAdjacentHTML("afterend", responseDiv.outerHTML);
     responseElement.scrollTop = responseElement.scrollHeight;
-  });
+  } catch (e) {
+  } finally {
+    document.getElementById("requests-abort").setAttribute("disabled", "");
+    abortController = undefined;
+  }
+});
+
+document.getElementById("requests-abort").addEventListener("click", () => {
+  if (abortController) {
+    abortController.abort();
+    abortController = undefined;
+  }
 });
 
 environmentElement.addEventListener("input", () => {
