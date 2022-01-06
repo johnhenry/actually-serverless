@@ -9,7 +9,7 @@ import setFunction from "./set-function.mjs";
 // import setTakeover from "./set-takeover.mjs";
 import createFunctionHandler from "./createFunctionHandler.mjs";
 import noFSHandler from "./no-fs-handler.mjs";
-
+import query from "https://johnhenry.github.io/lib/js/url-params/0.0.0/query.mjs";
 const { document, prompt } = globalThis;
 // const { log } = globalThis.console;
 const template = document.getElementById("template-host").innerHTML;
@@ -77,6 +77,17 @@ const clientsUpdated = async (event) => {
   const { index, total } = event.data;
   document.getElementById("client-index").innerText = `${index} [${total}]`;
   hostsUpdated(event);
+
+  if (query.claim) {
+    const hostName = query.claim;
+    Utils.PostToSW({
+      type: "claim-host",
+      host: hostName,
+    });
+    hosts[hostName] = hosts[hostName] || { fetch: defaultHandler };
+    delete query.claim;
+    history.replaceState({}, "", window.location.pathname);
+  }
 };
 const logs = [];
 const renderLogs = (log, logs, logElement) => {
@@ -297,7 +308,7 @@ document.body.addEventListener("click", (event) => {
       } else if (target.classList.contains("release-host")) {
         releaseHost(host, hosts);
       } else if (target.classList.contains("claim-host")) {
-        const hostName = prompt("Add Host:", host.id);
+        const hostName = host.id;
         if (hostName) {
           hosts[hostName] = hosts[hostName] || { fetch: defaultHandler };
           Utils.PostToSW({

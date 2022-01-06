@@ -161,6 +161,9 @@ header {
   background-color: var(--color-background);
   padding: var(--space);
 }
+header .title {
+  font-size: calc(var(--body-font-size) * 1.8);
+}
 
 header span {
   margin-left: auto;
@@ -278,17 +281,26 @@ header span {
 .host .close {
   cursor: pointer;
   margin-bottom: auto;
-}
-.host .close::before {
-  content: "×";
   color: Crimson;
+  font-size: calc(var(--body-font-size) * 3 / 4);
 }
+
 .unclaimed
   :is(.update-function, .set-file-handler, .load-function-file, .close) {
   display: none;
 }
+
+.claim-host {
+  display: none;
+}
+
 .unclaimed .claim-host {
   margin-left: auto;
+  display: block;
+}
+
+.unclimed .duplicate-host {
+  display: none;
 }
 
 .load-function-file {

@@ -39,10 +39,18 @@
         >
 
         <button onclick="" class="load-function-file">𝑓</button>
-
         <button class="set-file-handler">📁</button>
-        <button class="claim-host">+</button>
-        <span class="release-host close"></span>
+        <a
+          class="button duplicate-host"
+          target="_blank"
+          href="./?claim=$HOST_ID"
+          title="Duplicate host on another Node"
+          >+</a
+        >
+        <button class="claim-host" title="Claim host on this node">▼</button>
+        <span class="release-host close" title="Release host on this node"
+          >✖</span
+        >
       </main>
       <textarea
         class="update-function"
@@ -94,7 +102,7 @@ $FUNCTION_TEXT</textarea
   </head>
   <body>
     <header>
-      <a class="title" title="hosts" href="#"><h1>Local Custer</h1></a>
+      <a class="title" title="hosts" href="#">Local Custer</a>
       <a title="hosts" href="#">Hosts</a>
       <a title="environment" href="#environment">Environment</a>
       <a title="requests" href="#requests">Requests</a>

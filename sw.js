@@ -39,6 +39,7 @@ function storageClear() {
 }
 
 const DEFAULT_STATE = () => ({
+  version: 0,
   settings: {
     varcontext: true,
     varglobal: true,
