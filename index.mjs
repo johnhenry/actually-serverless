@@ -77,7 +77,6 @@ const clientsUpdated = async (event) => {
   const { index, total } = event.data;
   document.getElementById("client-index").innerText = `${index} [${total}]`;
   hostsUpdated(event);
-
   if (query.claim) {
     const hostName = query.claim;
     Utils.PostToSW({
@@ -160,7 +159,18 @@ const handleFetch = async (event) => {
       logElement
     );
     const host = hosts[event.data.host] || {};
-    const { fetch = defaultHandler, fileHandler = noFSHandler } = host;
+    const { fileHandler = noFSHandler } = host;
+
+    let reqMethod = request.method.split("").map((char) => char.toLowerCase());
+    reqMethod[0] = reqMethod[0].toUpperCase();
+    reqMethod = reqMethod.join("");
+
+    const fetch =
+      host.fetch[`onRequest${reqMethod}`] ||
+      host.fetch.onRequest ||
+      host.fetch.default ||
+      defaultHandler;
+
     const response = await fetch({
       request,
       fileHandler,

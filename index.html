@@ -155,7 +155,7 @@ accept: ...
       </section>
 
       <section id="settings" class="view">
-        <p class="help-text">Site settings</p>
+        <p class="help-text">Local settings.</p>
         <span>
           Inject Variables :
           <label>
@@ -277,22 +277,36 @@ accept: ...
       <section id="hosts" class="view hosts">
         <p class="help-text">Manage hosts on this node.</p>
         <span id="hosts-controls">
-          <button id="add-host">Add Host</button>
-          <label>
+          <button id="add-host" title="Add host to current node">
+            Add Host
+          </button>
+          <label title="Use random name when creating host">
             <input type="checkbox" id="settings-random-hostname" />
             Random Name
           </label>
-          <button id="settings-reload-cluster">reload</button>
-          <button id="settings-reset-cluster">reset</button>
-          <button id="settings-reset-cluster-and-close">reset + close</button>
-          |
           <a
             class="button"
             download="cluster-backup.json"
             id="settings-download-save"
+            title="Save cluster"
             >save</a
           >
-          <button id="settings-upload-save">restore</button>
+          <button id="settings-upload-save" title="Restore cluster">
+            restore
+          </button>
+          |
+          <button id="settings-reload-cluster" title="Reload all nodes">
+            reload
+          </button>
+          <button id="settings-reset-cluster" title="Reset cluster">
+            reset
+          </button>
+          <button
+            id="settings-reset-cluster-and-close"
+            title="Reset cluster and close other nodes"
+          >
+            reset + close nodes
+          </button>
         </span>
         <input type="file" id="select-file" style="display: none" />
         <div id="host-list"></div>

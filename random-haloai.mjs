@@ -8,6 +8,7 @@ const adjectives = [
   "adjutant",
   "ebullient",
   "exuberant",
+  "despondent",
   // "master",
 ];
 const nouns = [
@@ -19,6 +20,7 @@ const nouns = [
   "reflex",
   "prism",
   "witness",
+  "pyte",
   // "chief",
 ];
 export default () =>
