@@ -54,8 +54,9 @@
       </main>
       <textarea
         class="update-function"
-        placeholder="Click 📁 to serve a folder or add some code here to modify a request.
-Double-lick to load file."
+        placeholder="[fs:] (or leave blank) -- Serve 📁.
+[proxy: <http address>] -- Proxy to another endpoint.
+[export default ({request, fileHandler, env})=>...] -- Define custom endpont logic."
       >
 $FUNCTION_TEXT</textarea
       >
@@ -64,7 +65,7 @@ $FUNCTION_TEXT</textarea
   <head>
     <meta name="charset" value="utf8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Local Cluster for web development</title>
+    <title>Actually Serverless -- HTTP Endpoints Hosted Without Servers</title>
     <!--TODO: Update icon-->
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link
@@ -102,7 +103,7 @@ $FUNCTION_TEXT</textarea
   </head>
   <body>
     <header>
-      <a class="title" title="hosts" href="#">Local Custer</a>
+      <a class="title" title="hosts" href="#">Actually Serverless</a>
       <a title="hosts" href="#">Hosts</a>
       <a title="environment" href="#environment">Environment</a>
       <a title="requests" href="#requests">Requests</a>
@@ -186,88 +187,16 @@ accept: ...
       <section id="about" class="view">
         <p class="help-text">About this service.</p>
         <div>
-          <h3>What is this</h3>
+          <h3>What is this?</h3>
+          <p>Actually Serverless simulates a cluster of HTTP endpoints.</p>
           <p>
-            This site allows you to run a cluster of servers locally, within
-            your browser.
-          </p>
-          <p>
-            It works by using a service worker as a load balancer to intercept
-            requests and routes them to open tabs.
-          </p>
-          <p>
-            A request matching a given host (at /host/:hostname/...rest of url)
-            is sent to a tab where it is handled via <a>worker function</a> or a
-            static folder.
-          </p>
-          <p>
-            Workers functions have access to browser APIs including fetch and
-            alerts -- just to name a few -- as well as browser extensions. These
-            can all be used to handle requests.
-          </p>
-          <h3>Why is it useful</h3>
-          <p>A few use cases:</p>
-          <h4>Secure origin</h4>
-          <p>
-            Today, it is nearly impossible to do web development without a
-            server. Many browser APIs fail when a site is opened via the local
-            file system.
-          </p>
-          <p>
-            This services allows you to server any number of local folders
-            without installing a server. Additoinally, since this service is
-            served on a secure origin, you avoid that whole problem as well.
-          </p>
-          <h4>Testing Cloud Functions</h4>
-          <p>
-            This service allows one to easily fire up and test cloud functions.
-            It aims to be largely compatible with offerings like Deno Deploy and
-            Cloudflare Workers.
-          </p>
-          <h3>Comparison to Serevefolder.dev</h3>
-          <p>
-            This is a fork of
+            Learn more at
             <a
-              href="https://github.com/AshleyScirra/servefolder.dev"
+              href="https://github.com/johnhenry/actually-serverless"
               target="_blank"
-              >servefolder.dev</a
-            >
-
-            <a href="https://servefolder.dev/" target="_blank">(hosted here)</a
-            >, so comparisons are welcome.
+              >https://github.com/johnhenry/actually-serverless</a
+            >.
           </p>
-          <table class="comparison-table">
-            <tr>
-              <th>Feature</th>
-              <th>Servefolder.dev</th>
-              <th>LocalCluster</th>
-            </tr>
-            <tr>
-              <td>Static Directories</td>
-              <td colspan="2" class="clear-winner">✓</td>
-            </tr>
-            <tr>
-              <td>Cloud Functions</td>
-              <td>𐄂</td>
-              <td class="clear-winner">✓</td>
-            </tr>
-
-            <tr>
-              <td>Browser Compatibility</td>
-              <td class="clear-winner">All Major Browsers</td>
-              <td>Chrome + Edge</td>
-            </tr>
-            <tr>
-              <td>Host/Tab Topology</td>
-              <td>One-to-One</td>
-              <td class="clear-winner">Many-To-Many</td>
-            </tr>
-            <tr>
-              <td>Backup</td>
-              <td>Some settings saved.</td>
-              <td class="clear-winner">Most settings saved. Export/import.</td>
-            </tr>
-          </table>
         </div>
       </section>
       <section id="logs" class="view">
