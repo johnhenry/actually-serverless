@@ -1,6 +1,6 @@
 const defaultHandler = async ({ request: oldRequest }) => {
-  const __url = "PROXY_URL";
-  const __defaultPage = "PROXY_DEFAULT_PAGE";
+  const __url = `PROXY_URL`;
+  const __defaultPage = `PROXY_DEFAULT_PAGE`;
   const newURL = __url + new URL(oldRequest.url).pathname;
   const { headers, method, body } = oldRequest;
   const newRequest = new Request(newURL, { headers, method, body });

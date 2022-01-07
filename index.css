@@ -162,7 +162,7 @@ header {
   padding: var(--space);
 }
 header .title {
-  font-size: calc(var(--body-font-size) * 1.8);
+  font-size: calc(var(--body-font-size) * 1.4);
 }
 
 header span {
