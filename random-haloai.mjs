@@ -20,7 +20,7 @@ const nouns = [
   "reflex",
   "prism",
   "witness",
-  "pyte",
+  "pyre",
   // "chief",
 ];
 export default () =>

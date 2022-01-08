@@ -47,8 +47,23 @@ export default async () => {
         }
       } else {
         try {
-          const listHandle = await curFolderHandle.getDirectoryHandle(lastName);
-          body = await generateDirectoryListing(listHandle, relativeUrl);
+          try {
+            // Check for default 'index.html' if empty directory.
+            const tempFolderHandle = await curFolderHandle.getDirectoryHandle(
+              lastName
+            );
+            console.log({ tempFolderHandle });
+            const fileHandle = await tempFolderHandle.getFileHandle(
+              "index.html"
+            );
+            body = await fileHandle.getFile();
+          } catch (e) {
+            console.error(e);
+            const listHandle = await curFolderHandle.getDirectoryHandle(
+              lastName
+            );
+            body = await generateDirectoryListing(listHandle, relativeUrl);
+          }
         } catch {
           const fileHandle = await curFolderHandle.getFileHandle(lastName);
           body = await fileHandle.getFile();

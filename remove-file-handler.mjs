@@ -12,5 +12,4 @@ export default async (host, hosts) => {
       fs: item.fs,
     },
   });
-  host.querySelector(".set-file-handler").innerHTML = `📁`;
 };
