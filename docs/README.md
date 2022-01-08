@@ -1,8 +1,8 @@
-# Actually Serverless
+# Actually Serverless - Dynamic HTTP Endpoints in your Browser
 
 Hosted <a href="https://johnhenry.github.io/actually-serverless" target="_blank">here</a>.
 
-- [Actually Serverless](#actually-serverless)
+- [Actually Serverless - Dynamic HTTP Endpoints in your Browser](#actually-serverless---dynamic-http-endpoints-in-your-browser)
   - [Quick Start:](#quick-start)
   - [Detailed Guide](#detailed-guide)
   - [Why is it useful?](#why-is-it-useful)
