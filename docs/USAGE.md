@@ -20,23 +20,26 @@
 
 ## Adding a host
 
-Add a new host by clicking <button>Add Host</button>.
+Add a new host by clicking [<button>Add Host</button>].
 
-Visit this host by clicking its name in the list of hosts.
+Visit this host by clicking its name in the list of hosts next to "→".
 
 ### Dynamic Endpoint
 
 A newly added endpoint returns "not implemented" by default.
 
-𝑓: <textarea style="min-height:100px; min-width:400px" >
+𝑓:
+
+```javascript
 export default () =>
 new Response("not implemented", {
 status: 501,
 statusText: "Not Implemented",
 });
-};</textarea>
+};
+```
 
-Edit the textarea directly, or load a javascript file using <button>𝑓</button>.
+Edit the textarea directly, or load a javascript file using [<button>𝑓</button>].
 
 #### Endpoint exports
 
@@ -44,13 +47,19 @@ Define dynamic endpoints as ecmascript modules.
 
 Export a defult function that returns a [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) to handle requests.
 
-𝑓: <textarea style="min-height:20px; min-width:400px" >
-export default () => new Response(...)</textarea>
+𝑓:
+
+```javascript
+export default () => new Response(...)
+```
 
 The handler may be named "onRequest" instead of the "default".
 
-𝑓: <textarea style="min-height:20px; min-width:400px" >
-export const onRequest () => new Response(...)</textarea>
+𝑓:
+
+```javascript
+export const onRequest () => new Response(...)
+```
 
 Additonally, exported functions may correspond to request methods.
 
@@ -66,9 +75,11 @@ The handler can take a context object as an argument with the following properti
 
 - `context.request` - the [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) object
 - `context.env` - object containing variables defined in the Environment section
-- `context.fileHandler` - file handler used to access folder defined with <button>📁</button>
+- `context.fileHandler` - file handler used to access folder defined with [<button>📁</button>]
 
-𝑓: <textarea style="min-height:160px; min-width:600px" >
+𝑓:
+
+```javascript
 export const onRequestGet ({request}) => {
 return new Response(`GET request sent to ${request.url}`);
 }
@@ -78,7 +89,7 @@ return new Response(`POST request sent to ${request.url}`);
 export const onRequest ({request}) => {
 return new Response(`${request.method} request sent to ${request.url}`);
 }
-</textarea>
+```
 
 #### Browser APIs.
 
@@ -96,60 +107,76 @@ You are only limited by your imagination. Here are some ideas:
 
 ### Hosting a Static Folder
 
-Select a folder using <button>📁</button>
+Select a folder using [<button>📁</button>]
 and remove all text from the textarea
 to serve that directory at the endpoint.
 
-𝑓: <textarea style="min-height:20px; min-width:400px" ></textarea>
+𝑓:
+
+```javascript
+
+```
 
 Instead of leaving it empty, you may replace the text with "fs:".
 
-𝑓: <textarea style="min-height:20px; min-width:400px" >fs:</textarea>
+𝑓:
+
+```javascript
+fs:
+
+```
 
 You can also manually access the fileHandler object to access files
 in a custom endpoint.
 
-𝑓: <textarea style="min-height:200px; min-width:400px" >
+𝑓:
+
+```javascript
 // Only return .html files
 export default async ({ request, fileHandler }) => {
-if (!request.url.endsWith(".html")) {
-return new Response("forbidden", {
-status: 404,
-});
-}
-return fileHandler(request.url);
-};</textarea>
+  if (!request.url.endsWith(".html")) {
+    return new Response("forbidden", {
+      status: 404,
+    });
+  }
+  return fileHandler(request.url);
+};
+```
 
 ### Proxy URL
 
 Replace the text in the textarea with "proxy: <url>" to direct requests to that URL.
 
-𝑓: <textarea style="min-height:40px; min-width:400px">proxy:https://...</textarea>
+𝑓:
+
+```
+proxy:https://...
+```
 
 ### Remove a Host
 
-Remove host from node by clicking <button>✖</button>. If the host still exists on other node, it will still be visible; but less functional.
+Remove host from node by clicking [<button>✖</button>]. If the host still exists on other node, it will still be visible; but less functional.
 
 ### Load Balancer
 
-Clicking <button>+</button> duplicates a host on a new node (browser tabs). The new node shares handling of requests to that host.
+Clicking [<button>+</button>] duplicates a host on a new node (browser tabs). The new node shares handling of requests to that host.
 
 Update the strategy used to shared handling of hosts by
 clicking the dots (● ● ● ●) next to the host name.
 
-- <i style="color:Crimson">●</i> ● ● ● First -- Use the first active node defined
-- ● <i style="color:GoldenRod">●</i> ● ● Last Used - Use previously active node
-- ● ● <i style="color:ForestGreen">●</i> ● Round Robin -- Sequentially cycle through nodes
-- ● ● ● <i style="color:DeepSkyBlue">●</i> Random -- Randomly cycle through nodes
+- <i style="color:Crimson">○</i> ● ● ● First -- Use the first active node defined
+- ● <i style="color:GoldenRod">○</i> ● ● Last Used - Use previously active node
+- ● ● <i style="color:ForestGreen">○</i> ● Round Robin -- Sequentially cycle through nodes
+- ● ● ● <i style="color:DeepSkyBlue">○</i> Random -- Randomly cycle through nodes
 
 When a host does not exist on a node,
 it can be "claimed" on that node
-by clicking <button>▼</button>.
+by clicking [<button>▼</button>].
 
 ### Save and Restore
 
 Save and restore the cluster using
-<button>save</button> and <button>restore</button>, respectively.
+[<button>save</button>] and [<button>restore</button>], respectively.
 
 ## Other Tabs
 
@@ -162,16 +189,19 @@ Define variables used in endpoints here.
 They are available in both the context.env object that's passed to the request handler, as well as globally within the endpoint's closure.
 
 Enviromnemt:
-<textarea style="min-height:40px; min-width:400px" >
+
+```
 x=1
 y=2
-</textarea>
+```
 
-𝑓: <textarea style="min-height:80px; min-width:400px" >
+𝑓:
+
+```javascript
 export default ({ env }) => {
-return new Response(`${env.x} + ${y} = ${env.x + y}`);
+  return new Response(`${env.x} + ${y} = ${env.x + y}`);
 };
-</textarea>
+```
 
 ### Requests
 
