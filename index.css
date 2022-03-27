@@ -169,7 +169,7 @@ header .title {
 header span {
   margin-left: auto;
 }
-nav {
+header > nav {
   font-size: calc(var(--body-font-size) * 1.4);
   position: absolute;
   right: 100vw;
@@ -184,27 +184,27 @@ nav {
   gap: var(--space);
   border-right: 1px solid var(--color-midground);
 }
-nav .open-status {
+header > nav .open-status {
   width: 100;
   transition: 0.5s transform;
 }
-nav a {
+header > nav a {
   opacity: 0;
   transition: 0.5s opacity;
 }
-nav:is(:hover, :focus-within) a {
+header > nav:is(:hover, :focus-within) a {
   opacity: 1;
 }
 
-nav .open-status::before {
+header > nav .open-status::before {
   content: "◀";
 }
 
-nav:is(:hover, :focus-within) .open-status {
+header > nav:is(:hover, :focus-within) .open-status {
   transform: rotate(-90deg);
 }
 
-nav:is(:hover, :focus-within) {
+header > nav:is(:hover, :focus-within) {
   transform: translateX(100%);
 }
 
