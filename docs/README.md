@@ -78,11 +78,11 @@ If this should happen, save the cluster's data using the [<button>save</button>]
 
 This is a fork of <a href="https://github.com/AshleyScirra/servefolder.dev" target="_blank" >servefolder.dev</a>, so comparisons are welcome.
 
-| Feature               | ServeFolder.dev     | Actually Serverless |
-| --------------------- | ------------------- | ------------------- |
-| Static Directories    | ✓                   | ✓                   |
-| HTTP Endpoints        | 𐄂                   | ✓                   |
-| Browser Compatibility | All Major Browsers  | Chromium Browsers   |
-| Host/Tab Topology     | ✓                   | ✓                   |
-| Save on Refresh       | Some Settings Saved | Some Settings Saved |
-| Export/Import         | 𐄂                   | ✓                   |
+| Feature               | ServeFolder.dev     | Actually Serverless                  |
+| --------------------- | ------------------- | ------------------------------------ |
+| Static Directories    | ✓                   | ✓                                    |
+| HTTP Endpoints        | 𐄂                   | ✓                                    |
+| Browser Compatibility | All Major Browsers  | Chromium Browsers (including mobile) |
+| Host/Tab Topology     | ✓                   | ✓                                    |
+| Save on Refresh       | Some Settings Saved | Some Settings Saved                  |
+| Export/Import         | 𐄂                   | ✓                                    |
