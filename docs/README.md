@@ -49,7 +49,7 @@ This service allows one to test cloud functions without the need to run a server
 
 ## Limitations
 
-- While custom endpoints are saved, static directores must be re-loaded after refresh and cannot be saved. This is due to limitations of the current [window.showDirectoryPicker API](https://developer.mozilla.org/en-US/docs/Web/API/Window/showDirectoryPicker)/
+- While custom endpoints are saved, static directores must be re-loaded after refresh and cannot be saved. This is due to limitations of the current [window.showDirectoryPicker API](https://developer.mozilla.org/en-US/docs/Web/API/Window/showDirectoryPicker)
 - This is only accessible from inside the browser. External tools like curl, wget and insomnia are unavailable.
 
 ## Trouble Shooting
@@ -78,11 +78,12 @@ If this should happen, save the cluster's data using the [<button>save</button>]
 
 This is a fork of <a href="https://github.com/AshleyScirra/servefolder.dev" target="_blank" >servefolder.dev</a>, so comparisons are welcome.
 
-| Feature               | ServeFolder.dev     | Actually Serverless                  |
-| --------------------- | ------------------- | ------------------------------------ |
-| Static Directories    | ✓                   | ✓                                    |
-| HTTP Endpoints        | 𐄂                   | ✓                                    |
-| Browser Compatibility | All Major Browsers  | Chromium Browsers (including mobile) |
-| Host/Tab Topology     | ✓                   | ✓                                    |
-| Save on Refresh       | Some Settings Saved | Some Settings Saved                  |
-| Export/Import         | 𐄂                   | ✓                                    |
+| Feature                  | ServeFolder.dev          | Actually Serverless                  |
+| ------------------------ | ------------------------ | ------------------------------------ |
+| Static Directories       | ✓                        | ✓                                    |
+| HTTP Endpoints           | 𐄂                        | ✓                                    |
+| Browser Compatibility    | All Major Browsers       | Chromium Browsers (including mobile) |
+| Host/Tab Topology        | ✓                        | ✓                                    |
+| Save Function on Refresh | n/a                      | ✓                                    |
+| Save Folder on Refresh   | Additional Step Required | 𐄂                                    |
+| Export/Import            | 𐄂                        | ✓                                    |
