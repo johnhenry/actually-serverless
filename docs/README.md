@@ -82,7 +82,7 @@ This is a fork of <a href="https://github.com/AshleyScirra/servefolder.dev" targ
 | ------------------------ | ------------------------ | ------------------------------------ |
 | Static Directories       | ✓                        | ✓                                    |
 | HTTP Endpoints           | 𐄂                        | ✓                                    |
-| Browser Compatibility    | All Major Browsers       | Chromium Browsers (including mobile) |
+| Browser Compatibility    | All Major Browsers       | Chromium, Firefox (Except on iOS)    |
 | Host/Tab Topology        | ✓                        | ✓                                    |
 | Save Function on Refresh | n/a                      | ✓                                    |
 | Save Folder on Refresh   | Additional Step Required | 𐄂                                    |
